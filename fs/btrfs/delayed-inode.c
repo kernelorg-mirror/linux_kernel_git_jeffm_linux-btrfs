@@ -653,7 +653,7 @@ static int btrfs_delayed_inode_reserve_metadata(
 		if (!ret)
 			goto out;
 
-		if (btrfs_test_opt(root, ENOSPC_DEBUG)) {
+		if (btrfs_test_opt(root->fs_info, ENOSPC_DEBUG)) {
 			btrfs_debug(root->fs_info,
 				    "block rsv migrate returned %d", ret);
 			WARN_ON(1);
