@@ -5184,7 +5184,7 @@ void btrfs_evict_inode(struct inode *inode)
 	struct btrfs_root *root = BTRFS_I(inode)->root;
 	struct btrfs_block_rsv *rsv, *global_rsv;
 	int steal_from_global = 0;
-	u64 min_size = btrfs_calc_trunc_metadata_size(root, 1);
+	u64 min_size = btrfs_calc_trunc_metadata_size(root->fs_info, 1);
 	int ret;
 
 	trace_btrfs_inode_evict(inode);
@@ -9088,7 +9088,7 @@ static int btrfs_truncate(struct inode *inode)
 	int err = 0;
 	struct btrfs_trans_handle *trans;
 	u64 mask = root->fs_info->sectorsize - 1;
-	u64 min_size = btrfs_calc_trunc_metadata_size(root, 1);
+	u64 min_size = btrfs_calc_trunc_metadata_size(root->fs_info, 1);
 
 	ret = btrfs_wait_ordered_range(inode, inode->i_size & (~mask),
 				       (u64)-1);
