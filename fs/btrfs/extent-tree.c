@@ -10683,7 +10683,7 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 		 * Btrfs_remove_chunk will abort the transaction if things go
 		 * horribly wrong.
 		 */
-		ret = btrfs_remove_chunk(trans, root,
+		ret = btrfs_remove_chunk(trans, fs_info,
 					 block_group->key.objectid);
 
 		if (ret) {
