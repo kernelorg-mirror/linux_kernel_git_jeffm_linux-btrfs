@@ -3001,7 +3001,7 @@ retry_root_backup:
 		goto fail_sysfs;
 	}
 
-	ret = btrfs_read_block_groups(fs_info->extent_root);
+	ret = btrfs_read_block_groups(fs_info);
 	if (ret) {
 		btrfs_err(fs_info, "failed to read block groups: %d", ret);
 		goto fail_sysfs;

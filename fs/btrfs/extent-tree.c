@@ -9882,12 +9882,12 @@ btrfs_create_block_group_cache(struct btrfs_root *root, u64 start, u64 size)
 	return cache;
 }
 
-int btrfs_read_block_groups(struct btrfs_root *root)
+int btrfs_read_block_groups(struct btrfs_fs_info *info)
 {
+	struct btrfs_root *root = info->extent_root;
 	struct btrfs_path *path;
 	int ret;
 	struct btrfs_block_group_cache *cache;
-	struct btrfs_fs_info *info = root->fs_info;
 	struct btrfs_space_info *space_info;
 	struct btrfs_key key;
 	struct btrfs_key found_key;
@@ -9895,7 +9895,6 @@ int btrfs_read_block_groups(struct btrfs_root *root)
 	int need_clear = 0;
 	u64 cache_gen;
 
-	root = info->extent_root;
 	key.objectid = 0;
 	key.offset = 0;
 	key.type = BTRFS_BLOCK_GROUP_ITEM_KEY;
