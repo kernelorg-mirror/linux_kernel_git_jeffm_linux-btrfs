@@ -10447,9 +10447,10 @@ static void clear_avail_alloc_bits(struct btrfs_fs_info *fs_info, u64 flags)
 }
 
 int btrfs_remove_block_group(struct btrfs_trans_handle *trans,
-			     struct btrfs_root *root, u64 group_start,
+			     struct btrfs_fs_info *fs_info, u64 group_start,
 			     struct extent_map *em)
 {
+	struct btrfs_root *root = fs_info->extent_root;
 	struct btrfs_path *path;
 	struct btrfs_block_group_cache *block_group;
 	struct btrfs_free_cluster *cluster;
@@ -10463,9 +10464,7 @@ int btrfs_remove_block_group(struct btrfs_trans_handle *trans,
 	struct btrfs_caching_control *caching_ctl = NULL;
 	bool remove_em;
 
-	root = root->fs_info->extent_root;
-
-	block_group = btrfs_lookup_block_group(root->fs_info, group_start);
+	block_group = btrfs_lookup_block_group(fs_info, group_start);
 	BUG_ON(!block_group);
 	BUG_ON(!block_group->ro);
 
