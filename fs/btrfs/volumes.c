@@ -2752,8 +2752,9 @@ static int btrfs_del_sys_chunk(struct btrfs_root *root, u64 chunk_objectid, u64
 }
 
 int btrfs_remove_chunk(struct btrfs_trans_handle *trans,
-		       struct btrfs_root *root, u64 chunk_offset)
+		       struct btrfs_fs_info *fs_info, u64 chunk_offset)
 {
+	struct btrfs_root *root = fs_info->chunk_root;
 	struct extent_map_tree *em_tree;
 	struct extent_map *em;
 	struct btrfs_root *extent_root = root->fs_info->extent_root;
@@ -2764,8 +2765,7 @@ int btrfs_remove_chunk(struct btrfs_trans_handle *trans,
 	struct btrfs_fs_devices *fs_devices = root->fs_info->fs_devices;
 
 	/* Just in case */
-	root = root->fs_info->chunk_root;
-	em_tree = &root->fs_info->mapping_tree.map_tree;
+	em_tree = &fs_info->mapping_tree.map_tree;
 
 	read_lock(&em_tree->lock);
 	em = lookup_extent_mapping(em_tree, chunk_offset, 1);
@@ -2901,7 +2901,7 @@ static int btrfs_relocate_chunk(struct btrfs_root *root, u64 chunk_offset)
 	 * step two, delete the device extents and the
 	 * chunk tree entries
 	 */
-	ret = btrfs_remove_chunk(trans, root, chunk_offset);
+	ret = btrfs_remove_chunk(trans, root->fs_info, chunk_offset);
 	btrfs_end_transaction(trans, extent_root);
 	return ret;
 }
