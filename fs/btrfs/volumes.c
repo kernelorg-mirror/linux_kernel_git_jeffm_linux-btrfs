@@ -6703,8 +6703,9 @@ out_short_read:
 	return -EIO;
 }
 
-int btrfs_read_chunk_tree(struct btrfs_root *root)
+int btrfs_read_chunk_tree(struct btrfs_fs_info *fs_info)
 {
+	struct btrfs_root *root = fs_info->chunk_root;
 	struct btrfs_path *path;
 	struct extent_buffer *leaf;
 	struct btrfs_key key;
@@ -6712,8 +6713,6 @@ int btrfs_read_chunk_tree(struct btrfs_root *root)
 	int ret;
 	int slot;
 	u64 total_dev = 0;
-
-	root = root->fs_info->chunk_root;
 
 	path = btrfs_alloc_path();
 	if (!path)
