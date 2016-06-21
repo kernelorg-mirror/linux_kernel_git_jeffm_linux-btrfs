@@ -2871,7 +2871,7 @@ int open_ctree(struct super_block *sb,
 	sb->s_blocksize_bits = blksize_bits(sectorsize);
 
 	mutex_lock(&fs_info->chunk_mutex);
-	ret = btrfs_read_sys_array(tree_root);
+	ret = btrfs_read_sys_array(fs_info);
 	mutex_unlock(&fs_info->chunk_mutex);
 	if (ret) {
 		btrfs_err(fs_info, "failed to read the system array: %d", ret);
