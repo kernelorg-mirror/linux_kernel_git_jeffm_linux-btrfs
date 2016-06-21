@@ -2980,9 +2980,10 @@ error:
 	return ret;
 }
 
-static int insert_balance_item(struct btrfs_root *root,
+static int insert_balance_item(struct btrfs_fs_info *fs_info,
 			       struct btrfs_balance_control *bctl)
 {
+	struct btrfs_root *root = fs_info->tree_root;
 	struct btrfs_trans_handle *trans;
 	struct btrfs_balance_item *item;
 	struct btrfs_disk_balance_args disk_bargs;
@@ -3803,7 +3804,7 @@ int btrfs_balance(struct btrfs_balance_control *bctl,
 				bctl->sys.target));
 	}
 
-	ret = insert_balance_item(fs_info->tree_root, bctl);
+	ret = insert_balance_item(fs_info, bctl);
 	if (ret && ret != -EEXIST)
 		goto out;
 
