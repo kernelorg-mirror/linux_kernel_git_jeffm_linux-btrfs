@@ -2447,7 +2447,7 @@ static int btrfs_replay_log(struct btrfs_fs_info *fs_info,
 	}
 
 	if (fs_info->sb->s_flags & MS_RDONLY) {
-		ret = btrfs_commit_super(tree_root);
+		ret = btrfs_commit_super(fs_info);
 		if (ret)
 			return ret;
 	}
@@ -3835,8 +3835,9 @@ int btrfs_cleanup_fs_roots(struct btrfs_fs_info *fs_info)
 	return err;
 }
 
-int btrfs_commit_super(struct btrfs_root *root)
+int btrfs_commit_super(struct btrfs_fs_info *fs_info)
 {
+	struct btrfs_root *root = fs_info->tree_root;
 	struct btrfs_trans_handle *trans;
 
 	mutex_lock(&root->fs_info->cleaner_mutex);
@@ -3894,7 +3895,7 @@ void close_ctree(struct btrfs_fs_info *fs_info)
 		 */
 		btrfs_delete_unused_bgs(root->fs_info);
 
-		ret = btrfs_commit_super(root);
+		ret = btrfs_commit_super(fs_info);
 		if (ret)
 			btrfs_err(fs_info, "commit super ret %d", ret);
 	}
