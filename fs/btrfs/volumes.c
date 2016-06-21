@@ -1610,17 +1610,16 @@ error:
  * the btrfs_device struct should be fully filled in
  */
 static int btrfs_add_device(struct btrfs_trans_handle *trans,
-			    struct btrfs_root *root,
+			    struct btrfs_fs_info *fs_info,
 			    struct btrfs_device *device)
 {
+	struct btrfs_root *root = fs_info->chunk_root;
 	int ret;
 	struct btrfs_path *path;
 	struct btrfs_dev_item *dev_item;
 	struct extent_buffer *leaf;
 	struct btrfs_key key;
 	unsigned long ptr;
-
-	root = root->fs_info->chunk_root;
 
 	path = btrfs_alloc_path();
 	if (!path)
@@ -2404,7 +2403,7 @@ int btrfs_init_new_device(struct btrfs_root *root, char *device_path)
 		}
 	}
 
-	ret = btrfs_add_device(trans, root, device);
+	ret = btrfs_add_device(trans, root->fs_info, device);
 	if (ret) {
 		btrfs_abort_transaction(trans, ret);
 		goto error_trans;
