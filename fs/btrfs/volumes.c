@@ -4819,11 +4819,12 @@ error:
 }
 
 int btrfs_finish_chunk_alloc(struct btrfs_trans_handle *trans,
-				struct btrfs_root *extent_root,
+				struct btrfs_fs_info *fs_info,
 				u64 chunk_offset, u64 chunk_size)
 {
+	struct btrfs_root *extent_root = fs_info->extent_root;
+	struct btrfs_root *chunk_root = fs_info->chunk_root;
 	struct btrfs_key key;
-	struct btrfs_root *chunk_root = extent_root->fs_info->chunk_root;
 	struct btrfs_device *device;
 	struct btrfs_chunk *chunk;
 	struct btrfs_stripe *stripe;

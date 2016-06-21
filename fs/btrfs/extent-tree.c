@@ -10086,7 +10086,7 @@ void btrfs_create_pending_block_groups(struct btrfs_trans_handle *trans,
 					sizeof(item));
 		if (ret)
 			btrfs_abort_transaction(trans, ret);
-		ret = btrfs_finish_chunk_alloc(trans, extent_root,
+		ret = btrfs_finish_chunk_alloc(trans, extent_root->fs_info,
 					       key.objectid, key.offset);
 		if (ret)
 			btrfs_abort_transaction(trans, ret);
