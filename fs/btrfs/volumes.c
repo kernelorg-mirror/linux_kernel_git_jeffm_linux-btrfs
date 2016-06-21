@@ -2833,7 +2833,7 @@ int btrfs_remove_chunk(struct btrfs_trans_handle *trans,
 		goto out;
 	}
 
-	trace_btrfs_chunk_free(root, map, chunk_offset, em->len);
+	trace_btrfs_chunk_free(fs_info, map, chunk_offset, em->len);
 
 	if (map->type & BTRFS_BLOCK_GROUP_SYSTEM) {
 		ret = btrfs_del_sys_chunk(fs_info, chunk_objectid,
@@ -4750,7 +4750,7 @@ static int __btrfs_alloc_chunk(struct btrfs_trans_handle *trans,
 
 	num_bytes = stripe_size * data_stripes;
 
-	trace_btrfs_chunk_alloc(info->chunk_root, map, start, num_bytes);
+	trace_btrfs_chunk_alloc(info, map, start, num_bytes);
 
 	em = alloc_extent_map();
 	if (!em) {
