@@ -3634,7 +3634,8 @@ again:
 
 		if (cache->disk_cache_state == BTRFS_DC_SETUP) {
 			cache->io_ctl.inode = NULL;
-			ret = btrfs_write_out_cache(root, trans, cache, path);
+			ret = btrfs_write_out_cache(root->fs_info, trans,
+						    cache, path);
 			if (ret == 0 && cache->io_ctl.inode) {
 				num_started++;
 				should_put = 0;
@@ -3784,7 +3785,8 @@ int btrfs_write_dirty_block_groups(struct btrfs_trans_handle *trans,
 
 		if (!ret && cache->disk_cache_state == BTRFS_DC_SETUP) {
 			cache->io_ctl.inode = NULL;
-			ret = btrfs_write_out_cache(root, trans, cache, path);
+			ret = btrfs_write_out_cache(root->fs_info, trans,
+						    cache, path);
 			if (ret == 0 && cache->io_ctl.inode) {
 				num_started++;
 				should_put = 0;
