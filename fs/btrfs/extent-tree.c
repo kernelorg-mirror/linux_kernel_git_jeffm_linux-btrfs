@@ -9641,9 +9641,11 @@ out:
 	return ret;
 }
 
-static int find_first_block_group(struct btrfs_root *root,
-		struct btrfs_path *path, struct btrfs_key *key)
+static int find_first_block_group(struct btrfs_fs_info *fs_info,
+				  struct btrfs_path *path,
+				  struct btrfs_key *key)
 {
+	struct btrfs_root *root = fs_info->extent_root;
 	int ret = 0;
 	struct btrfs_key found_key;
 	struct extent_buffer *leaf;
@@ -9914,7 +9916,7 @@ int btrfs_read_block_groups(struct btrfs_fs_info *info)
 		need_clear = 1;
 
 	while (1) {
-		ret = find_first_block_group(root, path, &key);
+		ret = find_first_block_group(info, path, &key);
 		if (ret > 0)
 			break;
 		if (ret != 0)
