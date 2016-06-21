@@ -9716,8 +9716,9 @@ void btrfs_dec_block_group_ro(struct btrfs_root *root,
  * @return - -1 if it's not a good idea to relocate this block group, 0 if its
  * ok to go ahead and try.
  */
-int btrfs_can_relocate(struct btrfs_root *root, u64 bytenr)
+int btrfs_can_relocate(struct btrfs_fs_info *fs_info, u64 bytenr)
 {
+	struct btrfs_root *root = fs_info->extent_root;
 	struct btrfs_block_group_cache *block_group;
 	struct btrfs_space_info *space_info;
 	struct btrfs_fs_devices *fs_devices = root->fs_info->fs_devices;

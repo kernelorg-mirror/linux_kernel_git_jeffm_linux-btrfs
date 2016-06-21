@@ -2877,7 +2877,7 @@ static int btrfs_relocate_chunk(struct btrfs_fs_info *fs_info, u64 chunk_offset)
 	 */
 	ASSERT(mutex_is_locked(&root->fs_info->delete_unused_bgs_mutex));
 
-	ret = btrfs_can_relocate(extent_root, chunk_offset);
+	ret = btrfs_can_relocate(root->fs_info, chunk_offset);
 	if (ret)
 		return -ENOSPC;
 
