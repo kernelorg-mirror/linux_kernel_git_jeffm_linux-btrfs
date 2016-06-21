@@ -2455,12 +2455,14 @@ static int btrfs_replay_log(struct btrfs_fs_info *fs_info,
 	return 0;
 }
 
-static int btrfs_read_roots(struct btrfs_fs_info *fs_info,
-			    struct btrfs_root *tree_root)
+static int btrfs_read_roots(struct btrfs_fs_info *fs_info)
 {
+	struct btrfs_root *tree_root = fs_info->tree_root;
 	struct btrfs_root *root;
 	struct btrfs_key location;
 	int ret;
+
+	BUG_ON(!fs_info->tree_root);
 
 	location.objectid = BTRFS_EXTENT_TREE_OBJECTID;
 	location.type = BTRFS_ROOT_ITEM_KEY;
@@ -2947,7 +2949,7 @@ retry_root_backup:
 
 	mutex_unlock(&tree_root->objectid_mutex);
 
-	ret = btrfs_read_roots(fs_info, tree_root);
+	ret = btrfs_read_roots(fs_info);
 	if (ret)
 		goto recovery_tree_root;
 
