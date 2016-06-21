@@ -2667,14 +2667,14 @@ int btrfs_grow_device(struct btrfs_trans_handle *trans,
 }
 
 static int btrfs_free_chunk(struct btrfs_trans_handle *trans,
-			    struct btrfs_root *root, u64 chunk_objectid,
+			    struct btrfs_fs_info *fs_info, u64 chunk_objectid,
 			    u64 chunk_offset)
 {
+	struct btrfs_root *root = fs_info->chunk_root;
 	int ret;
 	struct btrfs_path *path;
 	struct btrfs_key key;
 
-	root = root->fs_info->chunk_root;
 	path = btrfs_alloc_path();
 	if (!path)
 		return -ENOMEM;
@@ -2826,7 +2826,8 @@ int btrfs_remove_chunk(struct btrfs_trans_handle *trans,
 	}
 	mutex_unlock(&fs_devices->device_list_mutex);
 
-	ret = btrfs_free_chunk(trans, root, chunk_objectid, chunk_offset);
+	ret = btrfs_free_chunk(trans, root->fs_info, chunk_objectid,
+			       chunk_offset);
 	if (ret) {
 		btrfs_abort_transaction(trans, ret);
 		goto out;
