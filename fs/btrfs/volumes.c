@@ -3034,8 +3034,9 @@ out:
 	return ret;
 }
 
-static int del_balance_item(struct btrfs_root *root)
+static int del_balance_item(struct btrfs_fs_info *fs_info)
 {
+	struct btrfs_root *root = fs_info->tree_root;
 	struct btrfs_trans_handle *trans;
 	struct btrfs_path *path;
 	struct btrfs_key key;
@@ -3672,7 +3673,7 @@ static void __cancel_balance(struct btrfs_fs_info *fs_info)
 	int ret;
 
 	unset_balance_control(fs_info);
-	ret = del_balance_item(fs_info->tree_root);
+	ret = del_balance_item(fs_info);
 	if (ret)
 		btrfs_handle_fs_error(fs_info, ret, NULL);
 
