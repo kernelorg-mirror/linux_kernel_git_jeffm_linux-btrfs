@@ -3110,7 +3110,7 @@ retry_root_backup:
 		if (ret) {
 			btrfs_warn(fs_info,
 				"failed to create free space tree: %d", ret);
-			close_ctree(tree_root);
+			close_ctree(fs_info);
 			return ret;
 		}
 	}
@@ -3119,7 +3119,7 @@ retry_root_backup:
 	if ((ret = btrfs_orphan_cleanup(fs_info->fs_root)) ||
 	    (ret = btrfs_orphan_cleanup(fs_info->tree_root))) {
 		up_read(&fs_info->cleanup_work_sem);
-		close_ctree(tree_root);
+		close_ctree(fs_info);
 		return ret;
 	}
 	up_read(&fs_info->cleanup_work_sem);
@@ -3127,14 +3127,14 @@ retry_root_backup:
 	ret = btrfs_resume_balance_async(fs_info);
 	if (ret) {
 		btrfs_warn(fs_info, "failed to resume balance: %d", ret);
-		close_ctree(tree_root);
+		close_ctree(fs_info);
 		return ret;
 	}
 
 	ret = btrfs_resume_dev_replace_async(fs_info);
 	if (ret) {
 		btrfs_warn(fs_info, "failed to resume device replace: %d", ret);
-		close_ctree(tree_root);
+		close_ctree(fs_info);
 		return ret;
 	}
 
@@ -3147,7 +3147,7 @@ retry_root_backup:
 		if (ret) {
 			btrfs_warn(fs_info,
 				"failed to clear free space tree: %d", ret);
-			close_ctree(tree_root);
+			close_ctree(fs_info);
 			return ret;
 		}
 	}
@@ -3158,7 +3158,7 @@ retry_root_backup:
 		if (ret) {
 			btrfs_warn(fs_info,
 				"failed to create the UUID tree: %d", ret);
-			close_ctree(tree_root);
+			close_ctree(fs_info);
 			return ret;
 		}
 	} else if (btrfs_test_opt(tree_root->fs_info, RESCAN_UUID_TREE) ||
@@ -3169,7 +3169,7 @@ retry_root_backup:
 		if (ret) {
 			btrfs_warn(fs_info,
 				"failed to check the UUID tree: %d", ret);
-			close_ctree(tree_root);
+			close_ctree(fs_info);
 			return ret;
 		}
 	} else {
@@ -3854,9 +3854,9 @@ int btrfs_commit_super(struct btrfs_root *root)
 	return btrfs_commit_transaction(trans, root);
 }
 
-void close_ctree(struct btrfs_root *root)
+void close_ctree(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
+	struct btrfs_root *root = fs_info->tree_root;
 	int ret;
 
 	fs_info->closing = 1;
