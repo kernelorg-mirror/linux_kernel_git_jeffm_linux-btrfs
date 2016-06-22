@@ -2254,30 +2254,29 @@ static void btrfs_init_balance(struct btrfs_fs_info *fs_info)
 
 static void btrfs_init_btree_inode(struct btrfs_fs_info *fs_info)
 {
-	fs_info->btree_inode->i_ino = BTRFS_BTREE_INODE_OBJECTID;
-	set_nlink(fs_info->btree_inode, 1);
+	struct inode *inode = fs_info->btree_inode;
+
+	inode->i_ino = BTRFS_BTREE_INODE_OBJECTID;
+	set_nlink(inode, 1);
 	/*
 	 * we set the i_size on the btree inode to the max possible int.
 	 * the real end of the address space is determined by all of
 	 * the devices in the system
 	 */
-	fs_info->btree_inode->i_size = OFFSET_MAX;
-	fs_info->btree_inode->i_mapping->a_ops = &btree_aops;
+	inode->i_size = OFFSET_MAX;
+	inode->i_mapping->a_ops = &btree_aops;
 
-	RB_CLEAR_NODE(&BTRFS_I(fs_info->btree_inode)->rb_node);
-	extent_io_tree_init(&BTRFS_I(fs_info->btree_inode)->io_tree,
-			     fs_info->btree_inode->i_mapping);
-	BTRFS_I(fs_info->btree_inode)->io_tree.track_uptodate = 0;
-	extent_map_tree_init(&BTRFS_I(fs_info->btree_inode)->extent_tree);
+	RB_CLEAR_NODE(&BTRFS_I(inode)->rb_node);
+	extent_io_tree_init(&BTRFS_I(inode)->io_tree, inode->i_mapping);
+	BTRFS_I(inode)->io_tree.track_uptodate = 0;
+	extent_map_tree_init(&BTRFS_I(inode)->extent_tree);
 
-	BTRFS_I(fs_info->btree_inode)->io_tree.ops = &btree_extent_io_ops;
+	BTRFS_I(inode)->io_tree.ops = &btree_extent_io_ops;
 
-	BTRFS_I(fs_info->btree_inode)->root = fs_info->tree_root;
-	memset(&BTRFS_I(fs_info->btree_inode)->location, 0,
-	       sizeof(struct btrfs_key));
-	set_bit(BTRFS_INODE_DUMMY,
-		&BTRFS_I(fs_info->btree_inode)->runtime_flags);
-	btrfs_insert_inode_hash(fs_info->btree_inode);
+	BTRFS_I(inode)->root = fs_info->tree_root;
+	memset(&BTRFS_I(inode)->location, 0, sizeof(struct btrfs_key));
+	set_bit(BTRFS_INODE_DUMMY, &BTRFS_I(inode)->runtime_flags);
+	btrfs_insert_inode_hash(inode);
 }
 
 static void btrfs_init_dev_replace_locks(struct btrfs_fs_info *fs_info)
