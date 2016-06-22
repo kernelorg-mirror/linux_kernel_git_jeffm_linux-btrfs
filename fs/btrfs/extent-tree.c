@@ -9430,9 +9430,8 @@ out:
 }
 
 int btrfs_force_chunk_alloc(struct btrfs_trans_handle *trans,
-			    struct btrfs_root *root, u64 type)
+			    struct btrfs_fs_info *fs_info, u64 type)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 alloc_flags = get_alloc_profile(fs_info, type);
 
 	return do_chunk_alloc(trans, fs_info, alloc_flags, CHUNK_ALLOC_FORCE);

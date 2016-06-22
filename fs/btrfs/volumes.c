@@ -3588,7 +3588,7 @@ again:
 				goto error;
 			}
 
-			ret = btrfs_force_chunk_alloc(trans, chunk_root,
+			ret = btrfs_force_chunk_alloc(trans, fs_info,
 						      BTRFS_BLOCK_GROUP_DATA);
 			btrfs_end_transaction(trans, chunk_root);
 			if (ret < 0) {
