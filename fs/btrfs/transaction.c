@@ -608,7 +608,7 @@ join_fail:
 	kmem_cache_free(btrfs_trans_handle_cachep, h);
 alloc_fail:
 	if (num_bytes)
-		btrfs_block_rsv_release(root, &fs_info->trans_block_rsv,
+		btrfs_block_rsv_release(fs_info, &fs_info->trans_block_rsv,
 					num_bytes);
 reserve_fail:
 	btrfs_qgroup_free_meta(root, qgroup_reserved);
@@ -802,7 +802,7 @@ static int should_end_transaction(struct btrfs_trans_handle *trans,
 	    btrfs_check_space_for_delayed_refs(trans, fs_info))
 		return 1;
 
-	return !!btrfs_block_rsv_check(root, &fs_info->global_block_rsv, 5);
+	return !!btrfs_block_rsv_check(&fs_info->global_block_rsv, 5);
 }
 
 int btrfs_should_end_transaction(struct btrfs_trans_handle *trans,

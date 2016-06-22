@@ -5293,11 +5293,10 @@ void btrfs_init_block_rsv(struct btrfs_block_rsv *rsv, unsigned short type)
 	rsv->type = type;
 }
 
-struct btrfs_block_rsv *btrfs_alloc_block_rsv(struct btrfs_root *root,
+struct btrfs_block_rsv *btrfs_alloc_block_rsv(struct btrfs_fs_info *fs_info,
 					      unsigned short type)
 {
 	struct btrfs_block_rsv *block_rsv;
-	struct btrfs_fs_info *fs_info = root->fs_info;
 
 	block_rsv = kmalloc(sizeof(*block_rsv), GFP_NOFS);
 	if (!block_rsv)
@@ -5309,12 +5308,12 @@ struct btrfs_block_rsv *btrfs_alloc_block_rsv(struct btrfs_root *root,
 	return block_rsv;
 }
 
-void btrfs_free_block_rsv(struct btrfs_root *root,
+void btrfs_free_block_rsv(struct btrfs_fs_info *fs_info,
 			  struct btrfs_block_rsv *rsv)
 {
 	if (!rsv)
 		return;
-	btrfs_block_rsv_release(root, rsv, (u64)-1);
+	btrfs_block_rsv_release(fs_info, rsv, (u64)-1);
 	kfree(rsv);
 }
 
@@ -5341,8 +5340,7 @@ int btrfs_block_rsv_add(struct btrfs_root *root,
 	return ret;
 }
 
-int btrfs_block_rsv_check(struct btrfs_root *root,
-			  struct btrfs_block_rsv *block_rsv, int min_factor)
+int btrfs_block_rsv_check(struct btrfs_block_rsv *block_rsv, int min_factor)
 {
 	u64 num_bytes = 0;
 	int ret = -ENOSPC;
@@ -5396,11 +5394,10 @@ int btrfs_block_rsv_migrate(struct btrfs_block_rsv *src_rsv,
 	return block_rsv_migrate_bytes(src_rsv, dst_rsv, num_bytes);
 }
 
-void btrfs_block_rsv_release(struct btrfs_root *root,
+void btrfs_block_rsv_release(struct btrfs_fs_info *fs_info,
 			     struct btrfs_block_rsv *block_rsv,
 			     u64 num_bytes)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_rsv *global_rsv = &fs_info->global_block_rsv;
 
 	if (global_rsv == block_rsv ||
@@ -5541,7 +5538,8 @@ void btrfs_trans_release_metadata(struct btrfs_trans_handle *trans,
 
 	trace_btrfs_space_reservation(fs_info, "transaction",
 				      trans->transid, trans->bytes_reserved, 0);
-	btrfs_block_rsv_release(root, trans->block_rsv, trans->bytes_reserved);
+	btrfs_block_rsv_release(fs_info, trans->block_rsv,
+				trans->bytes_reserved);
 	trans->bytes_reserved = 0;
 }
 
@@ -5590,7 +5588,7 @@ void btrfs_orphan_release_metadata(struct inode *inode)
 	u64 num_bytes = btrfs_calc_trans_metadata_size(fs_info, 1);
 	trace_btrfs_space_reservation(fs_info, "orphan",
 				      btrfs_ino(inode), num_bytes, 0);
-	btrfs_block_rsv_release(root, root->orphan_block_rsv, num_bytes);
+	btrfs_block_rsv_release(fs_info, root->orphan_block_rsv, num_bytes);
 }
 
 /*
@@ -5649,7 +5647,7 @@ void btrfs_subvolume_release_metadata(struct btrfs_root *root,
 				      struct btrfs_block_rsv *rsv,
 				      u64 qgroup_reserved)
 {
-	btrfs_block_rsv_release(root, rsv, (u64)-1);
+	btrfs_block_rsv_release(root->fs_info, rsv, (u64)-1);
 }
 
 /**
@@ -5891,7 +5889,7 @@ out_fail:
 		to_free += btrfs_calc_trans_metadata_size(fs_info, dropped);
 
 	if (to_free) {
-		btrfs_block_rsv_release(root, block_rsv, to_free);
+		btrfs_block_rsv_release(fs_info, block_rsv, to_free);
 		trace_btrfs_space_reservation(fs_info, "delalloc",
 					      btrfs_ino(inode), to_free, 0);
 	}
@@ -5912,7 +5910,6 @@ out_fail:
 void btrfs_delalloc_release_metadata(struct inode *inode, u64 num_bytes)
 {
 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-	struct btrfs_root *root = BTRFS_I(inode)->root;
 	u64 to_free = 0;
 	unsigned dropped;
 
@@ -5932,7 +5929,7 @@ void btrfs_delalloc_release_metadata(struct inode *inode, u64 num_bytes)
 	trace_btrfs_space_reservation(fs_info, "delalloc",
 				      btrfs_ino(inode), to_free, 0);
 
-	btrfs_block_rsv_release(root, &fs_info->delalloc_block_rsv, to_free);
+	btrfs_block_rsv_release(fs_info, &fs_info->delalloc_block_rsv, to_free);
 }
 
 /**

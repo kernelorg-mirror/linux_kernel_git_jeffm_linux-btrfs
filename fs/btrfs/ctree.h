@@ -2666,16 +2666,15 @@ void btrfs_delalloc_release_metadata(struct inode *inode, u64 num_bytes);
 int btrfs_delalloc_reserve_space(struct inode *inode, u64 start, u64 len);
 void btrfs_delalloc_release_space(struct inode *inode, u64 start, u64 len);
 void btrfs_init_block_rsv(struct btrfs_block_rsv *rsv, unsigned short type);
-struct btrfs_block_rsv *btrfs_alloc_block_rsv(struct btrfs_root *root,
+struct btrfs_block_rsv *btrfs_alloc_block_rsv(struct btrfs_fs_info *fs_info,
 					      unsigned short type);
-void btrfs_free_block_rsv(struct btrfs_root *root,
+void btrfs_free_block_rsv(struct btrfs_fs_info *fs_info,
 			  struct btrfs_block_rsv *rsv);
 void __btrfs_free_block_rsv(struct btrfs_block_rsv *rsv);
 int btrfs_block_rsv_add(struct btrfs_root *root,
 			struct btrfs_block_rsv *block_rsv, u64 num_bytes,
 			enum btrfs_reserve_flush_enum flush);
-int btrfs_block_rsv_check(struct btrfs_root *root,
-			  struct btrfs_block_rsv *block_rsv, int min_factor);
+int btrfs_block_rsv_check(struct btrfs_block_rsv *block_rsv, int min_factor);
 int btrfs_block_rsv_refill(struct btrfs_root *root,
 			   struct btrfs_block_rsv *block_rsv, u64 min_reserved,
 			   enum btrfs_reserve_flush_enum flush);
@@ -2685,7 +2684,7 @@ int btrfs_block_rsv_migrate(struct btrfs_block_rsv *src_rsv,
 int btrfs_cond_migrate_bytes(struct btrfs_fs_info *fs_info,
 			     struct btrfs_block_rsv *dest, u64 num_bytes,
 			     int min_factor);
-void btrfs_block_rsv_release(struct btrfs_root *root,
+void btrfs_block_rsv_release(struct btrfs_fs_info *fs_info,
 			     struct btrfs_block_rsv *block_rsv,
 			     u64 num_bytes);
 int btrfs_inc_block_group_ro(struct btrfs_root *root,

@@ -2476,7 +2476,7 @@ static int btrfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 		goto out;
 	}
 
-	rsv = btrfs_alloc_block_rsv(root, BTRFS_BLOCK_RSV_TEMP);
+	rsv = btrfs_alloc_block_rsv(fs_info, BTRFS_BLOCK_RSV_TEMP);
 	if (!rsv) {
 		ret = -ENOMEM;
 		goto out_free;
@@ -2599,7 +2599,7 @@ out_trans:
 	btrfs_btree_balance_dirty(root);
 out_free:
 	btrfs_free_path(path);
-	btrfs_free_block_rsv(root, rsv);
+	btrfs_free_block_rsv(fs_info, rsv);
 out:
 	unlock_extent_cached(&BTRFS_I(inode)->io_tree, lockstart, lockend,
 			     &cached_state, GFP_NOFS);
