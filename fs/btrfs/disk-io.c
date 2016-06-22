@@ -73,7 +73,7 @@ static void btrfs_destroy_delalloc_inodes(struct btrfs_root *root);
 static int btrfs_destroy_marked_extents(struct btrfs_root *root,
 					struct extent_io_tree *dirty_pages,
 					int mark);
-static int btrfs_destroy_pinned_extent(struct btrfs_root *root,
+static int btrfs_destroy_pinned_extent(struct btrfs_fs_info *fs_info,
 				       struct extent_io_tree *pinned_extents);
 static int btrfs_cleanup_transaction(struct btrfs_root *root);
 static void btrfs_error_commit_super(struct btrfs_root *root);
@@ -2228,8 +2228,7 @@ void btrfs_free_fs_roots(struct btrfs_fs_info *fs_info)
 
 	if (test_bit(BTRFS_FS_STATE_ERROR, &fs_info->fs_state)) {
 		btrfs_free_log_root_tree(NULL, fs_info);
-		btrfs_destroy_pinned_extent(fs_info->tree_root,
-					    fs_info->pinned_extents);
+		btrfs_destroy_pinned_extent(fs_info, fs_info->pinned_extents);
 	}
 }
 
@@ -4416,10 +4415,9 @@ static int btrfs_destroy_marked_extents(struct btrfs_root *root,
 	return ret;
 }
 
-static int btrfs_destroy_pinned_extent(struct btrfs_root *root,
+static int btrfs_destroy_pinned_extent(struct btrfs_fs_info *fs_info,
 				       struct extent_io_tree *pinned_extents)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_io_tree *unpin;
 	u64 start;
 	u64 end;
@@ -4435,7 +4433,7 @@ again:
 			break;
 
 		clear_extent_dirty(unpin, start, end);
-		btrfs_error_unpin_extent_range(root, start, end);
+		btrfs_error_unpin_extent_range(fs_info, start, end);
 		cond_resched();
 	}
 
@@ -4469,7 +4467,7 @@ void btrfs_cleanup_one_transaction(struct btrfs_transaction *cur_trans,
 
 	btrfs_destroy_marked_extents(root, &cur_trans->dirty_pages,
 				     EXTENT_DIRTY);
-	btrfs_destroy_pinned_extent(root,
+	btrfs_destroy_pinned_extent(fs_info,
 				    fs_info->pinned_extents);
 
 	cur_trans->state =TRANS_STATE_COMPLETED;
@@ -4528,7 +4526,7 @@ static int btrfs_cleanup_transaction(struct btrfs_root *root)
 	btrfs_destroy_all_ordered_extents(fs_info);
 	btrfs_destroy_delayed_inodes(fs_info);
 	btrfs_assert_delayed_root_empty(fs_info);
-	btrfs_destroy_pinned_extent(root, fs_info->pinned_extents);
+	btrfs_destroy_pinned_extent(fs_info, fs_info->pinned_extents);
 	btrfs_destroy_all_delalloc_inodes(fs_info);
 	mutex_unlock(&fs_info->transaction_kthread_mutex);
 

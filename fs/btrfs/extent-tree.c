@@ -6617,10 +6617,9 @@ void btrfs_prepare_extent_commit(struct btrfs_trans_handle *trans,
  * what it should be based on the mount options.
  */
 static struct btrfs_free_cluster *
-fetch_cluster_info(struct btrfs_root *root, struct btrfs_space_info *space_info,
-		   u64 *empty_cluster)
+fetch_cluster_info(struct btrfs_fs_info *fs_info,
+		   struct btrfs_space_info *space_info, u64 *empty_cluster)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_free_cluster *ret = NULL;
 	bool ssd = btrfs_test_opt(fs_info, SSD);
 
@@ -6641,10 +6640,10 @@ fetch_cluster_info(struct btrfs_root *root, struct btrfs_space_info *space_info,
 	return ret;
 }
 
-static int unpin_extent_range(struct btrfs_root *root, u64 start, u64 end,
+static int unpin_extent_range(struct btrfs_fs_info *fs_info,
+			      u64 start, u64 end,
 			      const bool return_free_space)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *cache = NULL;
 	struct btrfs_space_info *space_info;
 	struct btrfs_block_rsv *global_rsv = &fs_info->global_block_rsv;
@@ -6664,7 +6663,7 @@ static int unpin_extent_range(struct btrfs_root *root, u64 start, u64 end,
 			cache = btrfs_lookup_block_group(fs_info, start);
 			BUG_ON(!cache); /* Logic error */
 
-			cluster = fetch_cluster_info(root,
+			cluster = fetch_cluster_info(fs_info,
 						     cache->space_info,
 						     &empty_cluster);
 			empty_cluster <<= 1;
@@ -6772,7 +6771,7 @@ int btrfs_finish_extent_commit(struct btrfs_trans_handle *trans,
 						   end + 1 - start, NULL);
 
 		clear_extent_dirty(unpin, start, end);
-		unpin_extent_range(root, start, end, true);
+		unpin_extent_range(fs_info, start, end, true);
 		mutex_unlock(&fs_info->unused_bg_unpin_mutex);
 		cond_resched();
 	}
@@ -7498,7 +7497,7 @@ static noinline int find_free_extent(struct btrfs_root *orig_root,
 		spin_unlock(&space_info->lock);
 	}
 
-	last_ptr = fetch_cluster_info(orig_root, space_info, &empty_cluster);
+	last_ptr = fetch_cluster_info(fs_info, space_info, &empty_cluster);
 	if (last_ptr) {
 		spin_lock(&last_ptr->lock);
 		if (last_ptr->block_group)
@@ -11028,9 +11027,10 @@ out:
 	return ret;
 }
 
-int btrfs_error_unpin_extent_range(struct btrfs_root *root, u64 start, u64 end)
+int btrfs_error_unpin_extent_range(struct btrfs_fs_info *fs_info,
+				   u64 start, u64 end)
 {
-	return unpin_extent_range(root, start, end, false);
+	return unpin_extent_range(fs_info, start, end, false);
 }
 
 /*
