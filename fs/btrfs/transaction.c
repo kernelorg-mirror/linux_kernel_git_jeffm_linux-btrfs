@@ -721,8 +721,7 @@ btrfs_attach_transaction_barrier(struct btrfs_root *root)
 }
 
 /* wait for a transaction commit to be fully complete */
-static noinline void wait_for_commit(struct btrfs_root *root,
-				    struct btrfs_transaction *commit)
+static noinline void wait_for_commit(struct btrfs_transaction *commit)
 {
 	wait_event(commit->commit_wait, commit->state == TRANS_STATE_COMPLETED);
 }
@@ -780,7 +779,7 @@ int btrfs_wait_for_commit(struct btrfs_root *root, u64 transid)
 			goto out;  /* nothing committing|committed */
 	}
 
-	wait_for_commit(root, cur_trans);
+	wait_for_commit(cur_trans);
 	btrfs_put_transaction(cur_trans);
 out:
 	return ret;
@@ -2018,7 +2017,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 		atomic_inc(&cur_trans->use_count);
 		ret = btrfs_end_transaction(trans, root);
 
-		wait_for_commit(root, cur_trans);
+		wait_for_commit(cur_trans);
 
 		if (unlikely(cur_trans->aborted))
 			ret = cur_trans->aborted;
@@ -2038,7 +2037,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 			atomic_inc(&prev_trans->use_count);
 			spin_unlock(&fs_info->trans_lock);
 
-			wait_for_commit(root, prev_trans);
+			wait_for_commit(prev_trans);
 			ret = prev_trans->aborted;
 
 			btrfs_put_transaction(prev_trans);
