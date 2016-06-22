@@ -2169,10 +2169,9 @@ static int insert_reserved_file_extent(struct btrfs_trans_handle *trans,
 	ins.objectid = disk_bytenr;
 	ins.offset = disk_num_bytes;
 	ins.type = BTRFS_EXTENT_ITEM_KEY;
-	ret = btrfs_alloc_reserved_file_extent(trans, root,
-					root->root_key.objectid,
-					btrfs_ino(inode), file_pos,
-					ram_bytes, &ins);
+	ret = btrfs_alloc_reserved_file_extent(trans, root->root_key.objectid,
+					       btrfs_ino(inode), file_pos,
+					       ram_bytes, &ins);
 	/*
 	 * Release the reserved range from inode dirty range map, as it is
 	 * already moved into delayed_ref_head
