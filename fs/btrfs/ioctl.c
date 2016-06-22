@@ -2780,9 +2780,9 @@ out_drop_write:
 	return ret;
 }
 
-static long btrfs_ioctl_fs_info(struct btrfs_root *root, void __user *arg)
+static long btrfs_ioctl_fs_info(struct btrfs_fs_info *fs_info,
+				void __user *arg)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_ioctl_fs_info_args *fi_args;
 	struct btrfs_device *device;
 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
@@ -5569,7 +5569,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_RM_DEV_V2:
 		return btrfs_ioctl_rm_dev_v2(file, argp);
 	case BTRFS_IOC_FS_INFO:
-		return btrfs_ioctl_fs_info(root, argp);
+		return btrfs_ioctl_fs_info(fs_info, argp);
 	case BTRFS_IOC_DEV_INFO:
 		return btrfs_ioctl_dev_info(fs_info, argp);
 	case BTRFS_IOC_BALANCE:
