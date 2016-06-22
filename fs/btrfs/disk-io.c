@@ -1167,10 +1167,9 @@ int btrfs_wait_tree_block_writeback(struct extent_buffer *buf)
 				       buf->start, buf->start + buf->len - 1);
 }
 
-struct extent_buffer *read_tree_block(struct btrfs_root *root, u64 bytenr,
+struct extent_buffer *read_tree_block(struct btrfs_fs_info *fs_info, u64 bytenr,
 				      u64 parent_transid)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *buf = NULL;
 	int ret;
 
@@ -1534,7 +1533,8 @@ static struct btrfs_root *btrfs_read_tree_root(struct btrfs_root *tree_root,
 	}
 
 	generation = btrfs_root_generation(&root->root_item);
-	root->node = read_tree_block(root, btrfs_root_bytenr(&root->root_item),
+	root->node = read_tree_block(fs_info,
+				     btrfs_root_bytenr(&root->root_item),
 				     generation);
 	if (IS_ERR(root->node)) {
 		ret = PTR_ERR(root->node);
@@ -2401,7 +2401,6 @@ static int btrfs_replay_log(struct btrfs_fs_info *fs_info,
 			    struct btrfs_fs_devices *fs_devices)
 {
 	int ret;
-	struct btrfs_root *tree_root = fs_info->tree_root;
 	struct btrfs_root *log_tree_root;
 	struct btrfs_super_block *disk_super = fs_info->super_copy;
 	u64 bytenr = btrfs_super_log_root(disk_super);
@@ -2417,8 +2416,8 @@ static int btrfs_replay_log(struct btrfs_fs_info *fs_info,
 
 	__setup_root(log_tree_root, fs_info, BTRFS_TREE_LOG_OBJECTID);
 
-	log_tree_root->node = read_tree_block(tree_root, bytenr,
-			fs_info->generation + 1);
+	log_tree_root->node = read_tree_block(fs_info, bytenr,
+					      fs_info->generation + 1);
 	if (IS_ERR(log_tree_root->node)) {
 		btrfs_warn(fs_info, "failed to read log tree");
 		ret = PTR_ERR(log_tree_root->node);
@@ -2882,7 +2881,7 @@ int open_ctree(struct super_block *sb,
 
 	__setup_root(chunk_root, fs_info, BTRFS_CHUNK_TREE_OBJECTID);
 
-	chunk_root->node = read_tree_block(chunk_root,
+	chunk_root->node = read_tree_block(fs_info,
 					   btrfs_super_chunk_root(disk_super),
 					   generation);
 	if (IS_ERR(chunk_root->node) ||
@@ -2919,7 +2918,7 @@ int open_ctree(struct super_block *sb,
 retry_root_backup:
 	generation = btrfs_super_generation(disk_super);
 
-	tree_root->node = read_tree_block(tree_root,
+	tree_root->node = read_tree_block(fs_info,
 					  btrfs_super_root(disk_super),
 					  generation);
 	if (IS_ERR(tree_root->node) ||

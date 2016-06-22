@@ -1855,7 +1855,7 @@ again:
 				break;
 			}
 
-			eb = read_tree_block(dest, old_bytenr, old_ptr_gen);
+			eb = read_tree_block(fs_info, old_bytenr, old_ptr_gen);
 			if (IS_ERR(eb)) {
 				ret = PTR_ERR(eb);
 				break;
@@ -1981,6 +1981,7 @@ static noinline_for_stack
 int walk_down_reloc_tree(struct btrfs_root *root, struct btrfs_path *path,
 			 int *level)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *eb = NULL;
 	int i;
 	u64 bytenr;
@@ -2011,7 +2012,7 @@ int walk_down_reloc_tree(struct btrfs_root *root, struct btrfs_path *path,
 		}
 
 		bytenr = btrfs_node_blockptr(eb, path->slots[i]);
-		eb = read_tree_block(root, bytenr, ptr_gen);
+		eb = read_tree_block(fs_info, bytenr, ptr_gen);
 		if (IS_ERR(eb)) {
 			return PTR_ERR(eb);
 		} else if (!extent_buffer_uptodate(eb)) {
@@ -2658,6 +2659,7 @@ static int do_relocation(struct btrfs_trans_handle *trans,
 			 struct btrfs_key *key,
 			 struct btrfs_path *path, int lowest)
 {
+	struct btrfs_fs_info *fs_info = rc->extent_root->fs_info;
 	struct backref_node *upper;
 	struct backref_edge *edge;
 	struct backref_edge *edges[BTRFS_MAX_LEVEL - 1];
@@ -2729,7 +2731,7 @@ static int do_relocation(struct btrfs_trans_handle *trans,
 
 		blocksize = root->fs_info->nodesize;
 		generation = btrfs_node_ptr_generation(upper->eb, slot);
-		eb = read_tree_block(root, bytenr, generation);
+		eb = read_tree_block(fs_info, bytenr, generation);
 		if (IS_ERR(eb)) {
 			err = PTR_ERR(eb);
 			goto next;
@@ -2894,7 +2896,7 @@ static int get_tree_block_key(struct reloc_control *rc,
 	struct extent_buffer *eb;
 
 	BUG_ON(block->key_ready);
-	eb = read_tree_block(rc->extent_root, block->bytenr,
+	eb = read_tree_block(rc->extent_root->fs_info, block->bytenr,
 			     block->key.offset);
 	if (IS_ERR(eb)) {
 		return PTR_ERR(eb);

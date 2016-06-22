@@ -1448,7 +1448,7 @@ get_old_root(struct btrfs_root *root, u64 time_seq)
 	if (old_root && tm && tm->op != MOD_LOG_KEY_REMOVE_WHILE_FREEING) {
 		btrfs_tree_read_unlock(eb_root);
 		free_extent_buffer(eb_root);
-		old = read_tree_block(root, logical, 0);
+		old = read_tree_block(fs_info, logical, 0);
 		if (WARN_ON(IS_ERR(old) || !extent_buffer_uptodate(old))) {
 			if (!IS_ERR(old))
 				free_extent_buffer(old);
@@ -1700,7 +1700,7 @@ int btrfs_realloc_node(struct btrfs_trans_handle *trans,
 			uptodate = 0;
 		if (!cur || !uptodate) {
 			if (!cur) {
-				cur = read_tree_block(root, blocknr, gen);
+				cur = read_tree_block(fs_info, blocknr, gen);
 				if (IS_ERR(cur)) {
 					return PTR_ERR(cur);
 				} else if (!extent_buffer_uptodate(cur)) {
@@ -1881,6 +1881,7 @@ static void root_sub_used(struct btrfs_root *root, u32 size)
 static noinline struct extent_buffer *read_node_slot(struct btrfs_root *root,
 				   struct extent_buffer *parent, int slot)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	int level = btrfs_header_level(parent);
 	struct extent_buffer *eb;
 
@@ -1891,7 +1892,7 @@ static noinline struct extent_buffer *read_node_slot(struct btrfs_root *root,
 
 	BUG_ON(level == 0);
 
-	eb = read_tree_block(root, btrfs_node_blockptr(parent, slot),
+	eb = read_tree_block(fs_info, btrfs_node_blockptr(parent, slot),
 			     btrfs_node_ptr_generation(parent, slot));
 	if (IS_ERR(eb) || !extent_buffer_uptodate(eb)) {
 		if (!IS_ERR(eb))
@@ -2525,7 +2526,7 @@ read_block_for_search(struct btrfs_trans_handle *trans,
 	btrfs_release_path(p);
 
 	ret = -EAGAIN;
-	tmp = read_tree_block(root, blocknr, 0);
+	tmp = read_tree_block(fs_info, blocknr, 0);
 	if (!IS_ERR(tmp)) {
 		/*
 		 * If the read above didn't mark this buffer up to date,
