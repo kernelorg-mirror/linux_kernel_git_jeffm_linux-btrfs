@@ -2237,7 +2237,7 @@ static noinline_for_stack int merge_reloc_root(struct reloc_control *rc,
 		btrfs_end_transaction_throttle(trans, root);
 		trans = NULL;
 
-		btrfs_btree_balance_dirty(root);
+		btrfs_btree_balance_dirty(fs_info);
 
 		if (replaced && rc->stage == UPDATE_DATA_PTRS)
 			invalidate_extent_cache(root, &key, &next_key);
@@ -2267,7 +2267,7 @@ out:
 	if (trans)
 		btrfs_end_transaction_throttle(trans, root);
 
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 
 	if (replaced && rc->stage == UPDATE_DATA_PTRS)
 		invalidate_extent_cache(root, &key, &next_key);
@@ -3496,7 +3496,7 @@ truncate:
 	ret = btrfs_truncate_free_space_cache(root, trans, block_group, inode);
 
 	btrfs_end_transaction(trans, root);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 out:
 	iput(inode);
 	return ret;
@@ -4062,7 +4062,7 @@ restart:
 		}
 
 		btrfs_end_transaction_throttle(trans, rc->extent_root);
-		btrfs_btree_balance_dirty(rc->extent_root);
+		btrfs_btree_balance_dirty(fs_info);
 		trans = NULL;
 
 		if (rc->stage == MOVE_DATA_EXTENTS &&
@@ -4091,7 +4091,7 @@ restart:
 
 	if (trans) {
 		btrfs_end_transaction_throttle(trans, rc->extent_root);
-		btrfs_btree_balance_dirty(rc->extent_root);
+		btrfs_btree_balance_dirty(fs_info);
 	}
 
 	if (!err) {
@@ -4197,7 +4197,7 @@ struct inode *create_reloc_inode(struct btrfs_fs_info *fs_info,
 	err = btrfs_orphan_add(trans, inode);
 out:
 	btrfs_end_transaction(trans, root);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 	if (err) {
 		if (inode)
 			iput(inode);

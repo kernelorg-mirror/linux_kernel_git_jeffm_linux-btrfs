@@ -4017,10 +4017,9 @@ void btrfs_mark_buffer_dirty(struct extent_buffer *buf)
 #endif
 }
 
-static void __btrfs_btree_balance_dirty(struct btrfs_root *root,
+static void __btrfs_btree_balance_dirty(struct btrfs_fs_info *fs_info,
 					int flush_delayed)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	/*
 	 * looks as though older kernels can get into trouble with
 	 * this code, they end up stuck in balance_dirty_pages forever
@@ -4040,14 +4039,14 @@ static void __btrfs_btree_balance_dirty(struct btrfs_root *root,
 	}
 }
 
-void btrfs_btree_balance_dirty(struct btrfs_root *root)
+void btrfs_btree_balance_dirty(struct btrfs_fs_info *fs_info)
 {
-	__btrfs_btree_balance_dirty(root, 1);
+	__btrfs_btree_balance_dirty(fs_info, 1);
 }
 
-void btrfs_btree_balance_dirty_nodelay(struct btrfs_root *root)
+void btrfs_btree_balance_dirty_nodelay(struct btrfs_fs_info *fs_info)
 {
-	__btrfs_btree_balance_dirty(root, 0);
+	__btrfs_btree_balance_dirty(fs_info, 0);
 }
 
 int btrfs_read_buffer(struct extent_buffer *buf, u64 parent_transid)
