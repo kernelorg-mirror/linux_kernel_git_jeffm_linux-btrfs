@@ -2887,14 +2887,13 @@ static int tree_block_processed(u64 bytenr, struct reloc_control *rc)
 	return 0;
 }
 
-static int get_tree_block_key(struct reloc_control *rc,
+static int get_tree_block_key(struct btrfs_fs_info *fs_info,
 			      struct tree_block *block)
 {
 	struct extent_buffer *eb;
 
 	BUG_ON(block->key_ready);
-	eb = read_tree_block(rc->extent_root->fs_info, block->bytenr,
-			     block->key.offset);
+	eb = read_tree_block(fs_info, block->bytenr, block->key.offset);
 	if (IS_ERR(eb)) {
 		return PTR_ERR(eb);
 	} else if (!extent_buffer_uptodate(eb)) {
@@ -2973,6 +2972,7 @@ static noinline_for_stack
 int relocate_tree_blocks(struct btrfs_trans_handle *trans,
 			 struct reloc_control *rc, struct rb_root *blocks)
 {
+	struct btrfs_fs_info *fs_info = rc->extent_root->fs_info;
 	struct backref_node *node;
 	struct btrfs_path *path;
 	struct tree_block *block;
@@ -2998,7 +2998,7 @@ int relocate_tree_blocks(struct btrfs_trans_handle *trans,
 	while (rb_node) {
 		block = rb_entry(rb_node, struct tree_block, rb_node);
 		if (!block->key_ready) {
-			err = get_tree_block_key(rc, block);
+			err = get_tree_block_key(fs_info, block);
 			if (err)
 				goto out_free_path;
 		}
