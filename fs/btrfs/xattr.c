@@ -150,14 +150,14 @@ static int do_setxattr(struct btrfs_trans_handle *trans,
 		 */
 		ret = 0;
 		btrfs_assert_tree_locked(path->nodes[0]);
-		di = btrfs_match_dir_item_name(root, path, name, name_len);
+		di = btrfs_match_dir_item_name(fs_info, path, name, name_len);
 		if (!di && !(flags & XATTR_REPLACE)) {
 			ret = -ENOSPC;
 			goto out;
 		}
 	} else if (ret == -EEXIST) {
 		ret = 0;
-		di = btrfs_match_dir_item_name(root, path, name, name_len);
+		di = btrfs_match_dir_item_name(fs_info, path, name, name_len);
 		ASSERT(di); /* logic error */
 	} else if (ret) {
 		goto out;
