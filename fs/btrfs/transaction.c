@@ -715,7 +715,7 @@ btrfs_attach_transaction_barrier(struct btrfs_root *root)
 	trans = start_transaction(root, 0, TRANS_ATTACH,
 				  BTRFS_RESERVE_NO_FLUSH);
 	if (IS_ERR(trans) && PTR_ERR(trans) == -ENOENT)
-		btrfs_wait_for_commit(root, 0);
+		btrfs_wait_for_commit(root->fs_info, 0);
 
 	return trans;
 }
@@ -726,9 +726,8 @@ static noinline void wait_for_commit(struct btrfs_transaction *commit)
 	wait_event(commit->commit_wait, commit->state == TRANS_STATE_COMPLETED);
 }
 
-int btrfs_wait_for_commit(struct btrfs_root *root, u64 transid)
+int btrfs_wait_for_commit(struct btrfs_fs_info *fs_info, u64 transid)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_transaction *cur_trans = NULL, *t;
 	int ret = 0;
 

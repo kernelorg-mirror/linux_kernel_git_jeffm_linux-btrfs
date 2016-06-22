@@ -4344,7 +4344,7 @@ static noinline long btrfs_ioctl_wait_sync(struct btrfs_root *root,
 	} else {
 		transid = 0;  /* current trans */
 	}
-	return btrfs_wait_for_commit(root, transid);
+	return btrfs_wait_for_commit(root->fs_info, transid);
 }
 
 static long btrfs_ioctl_scrub(struct file *file, void __user *arg)
