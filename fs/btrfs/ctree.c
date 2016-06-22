@@ -4064,13 +4064,12 @@ out:
  * available for the resulting leaf level of the path.
  */
 static noinline void copy_for_split(struct btrfs_trans_handle *trans,
-				    struct btrfs_root *root,
+				    struct btrfs_fs_info *fs_info,
 				    struct btrfs_path *path,
 				    struct extent_buffer *l,
 				    struct extent_buffer *right,
 				    int slot, int mid, int nritems)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int data_copy_size;
 	int rt_data_off;
 	int i;
@@ -4342,7 +4341,7 @@ again:
 		return ret;
 	}
 
-	copy_for_split(trans, root, path, l, right, slot, mid, nritems);
+	copy_for_split(trans, fs_info, path, l, right, slot, mid, nritems);
 
 	if (split == 2) {
 		BUG_ON(num_doubles != 0);
