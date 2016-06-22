@@ -5119,11 +5119,10 @@ int btrfs_num_copies(struct btrfs_fs_info *fs_info, u64 logical, u64 len)
 	return ret;
 }
 
-unsigned long btrfs_full_stripe_len(struct btrfs_root *root,
+unsigned long btrfs_full_stripe_len(struct btrfs_fs_info *fs_info,
 				    struct btrfs_mapping_tree *map_tree,
 				    u64 logical)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_map *em;
 	struct map_lookup *map;
 	struct extent_map_tree *em_tree = &map_tree->map_tree;
