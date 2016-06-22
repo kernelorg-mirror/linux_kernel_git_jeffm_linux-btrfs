@@ -1306,7 +1306,7 @@ int btrfs_defrag_root(struct btrfs_root *root)
 		ret = btrfs_defrag_leaves(trans, root);
 
 		btrfs_end_transaction(trans, root);
-		btrfs_btree_balance_dirty(info->tree_root);
+		btrfs_btree_balance_dirty(info);
 		cond_resched();
 
 		if (btrfs_fs_closing(info) || ret != -EAGAIN)

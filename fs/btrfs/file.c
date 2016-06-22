@@ -1701,7 +1701,7 @@ again:
 
 		balance_dirty_pages_ratelimited(inode->i_mapping);
 		if (dirty_pages < (fs_info->nodesize >> PAGE_SHIFT) + 1)
-			btrfs_btree_balance_dirty(root);
+			btrfs_btree_balance_dirty(fs_info);
 
 		pos += copied;
 		num_written += copied;
@@ -2528,7 +2528,7 @@ static int btrfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 		}
 
 		btrfs_end_transaction(trans, root);
-		btrfs_btree_balance_dirty(root);
+		btrfs_btree_balance_dirty(fs_info);
 
 		trans = btrfs_start_transaction(root, rsv_count);
 		if (IS_ERR(trans)) {
@@ -2594,7 +2594,7 @@ out_trans:
 	ret = btrfs_update_inode(trans, root, inode);
 	updated_inode = true;
 	btrfs_end_transaction(trans, root);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 out_free:
 	btrfs_free_path(path);
 	btrfs_free_block_rsv(fs_info, rsv);

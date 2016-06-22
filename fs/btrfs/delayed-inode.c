@@ -1256,6 +1256,7 @@ int btrfs_commit_inode_delayed_items(struct btrfs_trans_handle *trans,
 
 int btrfs_commit_inode_delayed_inode(struct inode *inode)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	struct btrfs_trans_handle *trans;
 	struct btrfs_delayed_node *delayed_node = btrfs_get_delayed_node(inode);
 	struct btrfs_path *path;
@@ -1287,7 +1288,7 @@ int btrfs_commit_inode_delayed_inode(struct inode *inode)
 	path->leave_spinning = 1;
 
 	block_rsv = trans->block_rsv;
-	trans->block_rsv = &delayed_node->root->fs_info->delayed_block_rsv;
+	trans->block_rsv = &fs_info->delayed_block_rsv;
 
 	mutex_lock(&delayed_node->mutex);
 	if (test_bit(BTRFS_DELAYED_NODE_INODE_DIRTY, &delayed_node->flags))
@@ -1301,7 +1302,7 @@ int btrfs_commit_inode_delayed_inode(struct inode *inode)
 	trans->block_rsv = block_rsv;
 trans_out:
 	btrfs_end_transaction(trans, delayed_node->root);
-	btrfs_btree_balance_dirty(delayed_node->root);
+	btrfs_btree_balance_dirty(fs_info);
 out:
 	btrfs_release_delayed_node(delayed_node);
 
@@ -1366,7 +1367,7 @@ again:
 
 	trans->block_rsv = block_rsv;
 	btrfs_end_transaction(trans, root);
-	btrfs_btree_balance_dirty_nodelay(root);
+	btrfs_btree_balance_dirty_nodelay(root->fs_info);
 
 release_path:
 	btrfs_release_path(path);

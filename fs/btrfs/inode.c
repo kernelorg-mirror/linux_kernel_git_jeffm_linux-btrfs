@@ -4127,7 +4127,7 @@ static int btrfs_unlink(struct inode *dir, struct dentry *dentry)
 
 out:
 	btrfs_end_transaction(trans, root);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(root->fs_info);
 	return ret;
 }
 
@@ -4247,7 +4247,7 @@ static int btrfs_rmdir(struct inode *dir, struct dentry *dentry)
 		btrfs_i_size_write(inode, 0);
 out:
 	btrfs_end_transaction(trans, root);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(root->fs_info);
 
 	return err;
 }
@@ -5317,7 +5317,7 @@ void btrfs_evict_inode(struct inode *inode)
 		trans->block_rsv = &fs_info->trans_block_rsv;
 		btrfs_end_transaction(trans, root);
 		trans = NULL;
-		btrfs_btree_balance_dirty(root);
+		btrfs_btree_balance_dirty(fs_info);
 	}
 
 	btrfs_free_block_rsv(fs_info, rsv);
@@ -5339,7 +5339,7 @@ void btrfs_evict_inode(struct inode *inode)
 		btrfs_return_ino(root, btrfs_ino(inode));
 
 	btrfs_end_transaction(trans, root);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 no_delete:
 	btrfs_remove_delayed_node(inode);
 	clear_inode(inode);
@@ -6449,7 +6449,7 @@ static int btrfs_mknod(struct inode *dir, struct dentry *dentry,
 out_unlock:
 	btrfs_end_transaction(trans, root);
 	btrfs_balance_delayed_items(fs_info);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 	if (drop_inode) {
 		inode_dec_link_count(inode);
 		iput(inode);
@@ -6529,7 +6529,7 @@ out_unlock:
 		iput(inode);
 	}
 	btrfs_balance_delayed_items(fs_info);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 	return err;
 
 out_unlock_inode:
@@ -6610,7 +6610,7 @@ fail:
 		inode_dec_link_count(inode);
 		iput(inode);
 	}
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 	return err;
 }
 
@@ -6680,7 +6680,7 @@ out_fail:
 		iput(inode);
 	}
 	btrfs_balance_delayed_items(fs_info);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 	return err;
 
 out_fail_inode:
@@ -9183,7 +9183,7 @@ static int btrfs_truncate(struct inode *inode)
 		}
 
 		btrfs_end_transaction(trans, root);
-		btrfs_btree_balance_dirty(root);
+		btrfs_btree_balance_dirty(fs_info);
 
 		trans = btrfs_start_transaction(root, 2);
 		if (IS_ERR(trans)) {
@@ -9212,7 +9212,7 @@ static int btrfs_truncate(struct inode *inode)
 			err = ret;
 
 		ret = btrfs_end_transaction(trans, root);
-		btrfs_btree_balance_dirty(root);
+		btrfs_btree_balance_dirty(fs_info);
 	}
 
 out:
@@ -10288,7 +10288,7 @@ out_unlock:
 		inode_dec_link_count(inode);
 		iput(inode);
 	}
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 	return err;
 
 out_unlock_inode:
@@ -10525,7 +10525,7 @@ out:
 	if (ret)
 		iput(inode);
 	btrfs_balance_delayed_items(fs_info);
-	btrfs_btree_balance_dirty(root);
+	btrfs_btree_balance_dirty(fs_info);
 	return ret;
 
 out_inode:
