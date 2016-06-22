@@ -68,7 +68,7 @@ static int btrfs_check_super_valid(struct btrfs_fs_info *fs_info,
 				    int read_only);
 static void btrfs_destroy_ordered_extents(struct btrfs_root *root);
 static int btrfs_destroy_delayed_refs(struct btrfs_transaction *trans,
-				      struct btrfs_root *root);
+				      struct btrfs_fs_info *fs_info);
 static void btrfs_destroy_delalloc_inodes(struct btrfs_root *root);
 static int btrfs_destroy_marked_extents(struct btrfs_root *root,
 					struct extent_io_tree *dirty_pages,
@@ -4259,9 +4259,8 @@ static void btrfs_destroy_all_ordered_extents(struct btrfs_fs_info *fs_info)
 }
 
 static int btrfs_destroy_delayed_refs(struct btrfs_transaction *trans,
-				      struct btrfs_root *root)
+				      struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct rb_node *node;
 	struct btrfs_delayed_ref_root *delayed_refs;
 	struct btrfs_delayed_ref_node *ref;
@@ -4452,7 +4451,7 @@ void btrfs_cleanup_one_transaction(struct btrfs_transaction *cur_trans,
 {
 	struct btrfs_fs_info *fs_info = root->fs_info;
 
-	btrfs_destroy_delayed_refs(cur_trans, root);
+	btrfs_destroy_delayed_refs(cur_trans, fs_info);
 
 	cur_trans->state = TRANS_STATE_COMMIT_START;
 	wake_up(&fs_info->transaction_blocked_wait);
