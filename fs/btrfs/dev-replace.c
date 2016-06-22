@@ -321,7 +321,7 @@ int btrfs_dev_replace_start(struct btrfs_root *root, char *tgtdev_name,
 		return ret;
 	}
 
-	ret = btrfs_init_dev_replace_tgtdev(root, tgtdev_name,
+	ret = btrfs_init_dev_replace_tgtdev(fs_info, tgtdev_name,
 					    src_device, &tgt_device);
 	mutex_unlock(&fs_info->volume_mutex);
 	if (ret)
