@@ -6254,11 +6254,10 @@ struct btrfs_device *btrfs_alloc_device(struct btrfs_fs_info *fs_info,
 }
 
 /* Return -EIO if any error, otherwise return 0. */
-static int btrfs_check_chunk_valid(struct btrfs_root *root,
+static int btrfs_check_chunk_valid(struct btrfs_fs_info *fs_info,
 				   struct extent_buffer *leaf,
 				   struct btrfs_chunk *chunk, u64 logical)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 length;
 	u64 stripe_len;
 	u16 num_stripes;
@@ -6319,11 +6318,10 @@ static int btrfs_check_chunk_valid(struct btrfs_root *root,
 	return 0;
 }
 
-static int read_one_chunk(struct btrfs_root *root, struct btrfs_key *key,
+static int read_one_chunk(struct btrfs_fs_info *fs_info, struct btrfs_key *key,
 			  struct extent_buffer *leaf,
 			  struct btrfs_chunk *chunk)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_mapping_tree *map_tree = &fs_info->mapping_tree;
 	struct map_lookup *map;
 	struct extent_map *em;
@@ -6341,7 +6339,7 @@ static int read_one_chunk(struct btrfs_root *root, struct btrfs_key *key,
 	stripe_len = btrfs_chunk_stripe_len(leaf, chunk);
 	num_stripes = btrfs_chunk_num_stripes(leaf, chunk);
 
-	ret = btrfs_check_chunk_valid(root, leaf, chunk, logical);
+	ret = btrfs_check_chunk_valid(fs_info, leaf, chunk, logical);
 	if (ret)
 		return ret;
 
@@ -6675,7 +6673,7 @@ int btrfs_read_sys_array(struct btrfs_fs_info *fs_info)
 			if (cur_offset + len > array_size)
 				goto out_short_read;
 
-			ret = read_one_chunk(root, &key, sb, chunk);
+			ret = read_one_chunk(fs_info, &key, sb, chunk);
 			if (ret)
 				break;
 		} else {
@@ -6754,7 +6752,7 @@ int btrfs_read_chunk_tree(struct btrfs_fs_info *fs_info)
 		} else if (found_key.type == BTRFS_CHUNK_ITEM_KEY) {
 			struct btrfs_chunk *chunk;
 			chunk = btrfs_item_ptr(leaf, slot, struct btrfs_chunk);
-			ret = read_one_chunk(root, &found_key, leaf, chunk);
+			ret = read_one_chunk(fs_info, &found_key, leaf, chunk);
 			if (ret)
 				goto error;
 		}
