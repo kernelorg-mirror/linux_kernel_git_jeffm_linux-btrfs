@@ -599,7 +599,7 @@ static noinline int create_subvol(struct inode *dir,
 	ret = btrfs_update_inode(trans, root, dir);
 	BUG_ON(ret);
 
-	ret = btrfs_add_root_ref(trans, root->fs_info->tree_root,
+	ret = btrfs_add_root_ref(trans, root->fs_info,
 				 objectid, root->root_key.objectid,
 				 btrfs_ino(dir), index, name, namelen);
 	BUG_ON(ret);
