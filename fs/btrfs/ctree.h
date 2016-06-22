@@ -2524,8 +2524,10 @@ static inline u64 btrfs_calc_trunc_metadata_size(struct btrfs_fs_info *fs_info,
 	return fs_info->nodesize * BTRFS_MAX_LEVEL * num_items;
 }
 
-int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans);
-int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans);
+int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans,
+				       struct btrfs_fs_info *fs_info);
+int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans,
+				       struct btrfs_fs_info *fs_info);
 void btrfs_dec_block_group_reservations(struct btrfs_fs_info *fs_info,
 					 const u64 start);
 void btrfs_wait_block_group_reservations(struct btrfs_block_group_cache *bg);
@@ -2537,9 +2539,9 @@ int btrfs_run_delayed_refs(struct btrfs_trans_handle *trans,
 			   struct btrfs_root *root, unsigned long count);
 int btrfs_async_run_delayed_refs(struct btrfs_fs_info *fs_info,
 				 unsigned long count, int wait);
-int btrfs_lookup_data_extent(struct btrfs_root *root, u64 start, u64 len);
+int btrfs_lookup_data_extent(struct btrfs_fs_info *fs_info, u64 start, u64 len);
 int btrfs_lookup_extent_info(struct btrfs_trans_handle *trans,
-			     struct btrfs_root *root, u64 bytenr,
+			     struct btrfs_fs_info *fs_info, u64 bytenr,
 			     u64 offset, int metadata, u64 *refs, u64 *flags);
 int btrfs_pin_extent(struct btrfs_root *root,
 		     u64 bytenr, u64 num, int reserved);

@@ -790,9 +790,8 @@ void btrfs_clear_space_info_full(struct btrfs_fs_info *info)
 }
 
 /* simple helper to search for an existing data extent at a given offset */
-int btrfs_lookup_data_extent(struct btrfs_root *root, u64 start, u64 len)
+int btrfs_lookup_data_extent(struct btrfs_fs_info *fs_info, u64 start, u64 len)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	struct btrfs_key key;
 	struct btrfs_path *path;
@@ -819,10 +818,9 @@ int btrfs_lookup_data_extent(struct btrfs_root *root, u64 start, u64 len)
  * the delayed refs are not processed.
  */
 int btrfs_lookup_extent_info(struct btrfs_trans_handle *trans,
-			     struct btrfs_root *root, u64 bytenr,
+			     struct btrfs_fs_info *fs_info, u64 bytenr,
 			     u64 offset, int metadata, u64 *refs, u64 *flags)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_delayed_ref_head *head;
 	struct btrfs_delayed_ref_root *delayed_refs;
 	struct btrfs_path *path;
@@ -2779,9 +2777,9 @@ u64 btrfs_csum_bytes_to_leaves(struct btrfs_fs_info *fs_info, u64 csum_bytes)
 	return num_csums;
 }
 
-int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans)
+int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans,
+				       struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_rsv *global_rsv;
 	u64 num_heads = trans->transaction->delayed_refs.num_heads_ready;
 	u64 csum_bytes = trans->transaction->delayed_refs.pending_csums;
@@ -2815,9 +2813,9 @@ int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans)
 	return ret;
 }
 
-int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans)
+int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans,
+				       struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 num_entries =
 		atomic_read(&trans->transaction->delayed_refs.num_entries);
 	u64 avg_runtime;
@@ -2831,7 +2829,7 @@ int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans)
 	if (val >= NSEC_PER_SEC / 2)
 		return 2;
 
-	return btrfs_check_space_for_delayed_refs(trans);
+	return btrfs_check_space_for_delayed_refs(trans, fs_info);
 }
 
 struct async_delayed_refs {
@@ -8308,7 +8306,7 @@ static noinline void reada_walk_down(struct btrfs_trans_handle *trans,
 			continue;
 
 		/* We don't lock the tree block, it's OK to be racy here */
-		ret = btrfs_lookup_extent_info(trans, root, bytenr,
+		ret = btrfs_lookup_extent_info(trans, fs_info, bytenr,
 					       wc->level - 1, 1, &refs,
 					       &flags);
 		/* We don't care about errors in readahead. */
@@ -8599,6 +8597,7 @@ static noinline int walk_down_proc(struct btrfs_trans_handle *trans,
 				   struct btrfs_path *path,
 				   struct walk_control *wc, int lookup_info)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	int level = wc->level;
 	struct extent_buffer *eb = path->nodes[level];
 	u64 flag = BTRFS_BLOCK_FLAG_FULL_BACKREF;
@@ -8616,7 +8615,7 @@ static noinline int walk_down_proc(struct btrfs_trans_handle *trans,
 	    ((wc->stage == DROP_REFERENCE && wc->refs[level] != 1) ||
 	     (wc->stage == UPDATE_BACKREF && !(wc->flags[level] & flag)))) {
 		BUG_ON(!path->locks[level]);
-		ret = btrfs_lookup_extent_info(trans, root,
+		ret = btrfs_lookup_extent_info(trans, fs_info,
 					       eb->start, level, 1,
 					       &wc->refs[level],
 					       &wc->flags[level]);
@@ -8721,7 +8720,7 @@ static noinline int do_walk_down(struct btrfs_trans_handle *trans,
 	btrfs_tree_lock(next);
 	btrfs_set_lock_blocking(next);
 
-	ret = btrfs_lookup_extent_info(trans, root, bytenr, level - 1, 1,
+	ret = btrfs_lookup_extent_info(trans, fs_info, bytenr, level - 1, 1,
 				       &wc->refs[level - 1],
 				       &wc->flags[level - 1]);
 	if (ret < 0) {
@@ -8871,7 +8870,7 @@ static noinline int walk_up_proc(struct btrfs_trans_handle *trans,
 			btrfs_set_lock_blocking(eb);
 			path->locks[level] = BTRFS_WRITE_LOCK_BLOCKING;
 
-			ret = btrfs_lookup_extent_info(trans, root,
+			ret = btrfs_lookup_extent_info(trans, fs_info,
 						       eb->start, level, 1,
 						       &wc->refs[level],
 						       &wc->flags[level]);
@@ -9093,7 +9092,7 @@ int btrfs_drop_snapshot(struct btrfs_root *root,
 			btrfs_set_lock_blocking(path->nodes[level]);
 			path->locks[level] = BTRFS_WRITE_LOCK_BLOCKING;
 
-			ret = btrfs_lookup_extent_info(trans, root,
+			ret = btrfs_lookup_extent_info(trans, fs_info,
 						path->nodes[level]->start,
 						level, 1, &wc->refs[level],
 						&wc->flags[level]);
