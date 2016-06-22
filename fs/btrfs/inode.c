@@ -6327,7 +6327,7 @@ int btrfs_add_link(struct btrfs_trans_handle *trans,
 	}
 
 	if (unlikely(ino == BTRFS_FIRST_FREE_OBJECTID)) {
-		ret = btrfs_add_root_ref(trans, root->fs_info->tree_root,
+		ret = btrfs_add_root_ref(trans, root->fs_info,
 					 key.objectid, root->root_key.objectid,
 					 parent_ino, index, name, name_len);
 	} else if (add_backref) {
