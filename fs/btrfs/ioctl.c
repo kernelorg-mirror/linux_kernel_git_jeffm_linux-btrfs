@@ -412,7 +412,7 @@ static noinline int btrfs_ioctl_fitrim(struct file *file, void __user *arg)
 
 	range.len = min(range.len, total_bytes - range.start);
 	range.minlen = max(range.minlen, minlen);
-	ret = btrfs_trim_fs(fs_info->tree_root, &range);
+	ret = btrfs_trim_fs(fs_info, &range);
 	if (ret < 0)
 		return ret;
 
