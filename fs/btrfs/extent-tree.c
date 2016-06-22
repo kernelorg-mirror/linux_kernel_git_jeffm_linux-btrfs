@@ -3296,10 +3296,9 @@ fail:
 }
 
 static struct btrfs_block_group_cache *
-next_block_group(struct btrfs_root *root,
+next_block_group(struct btrfs_fs_info *fs_info,
 		 struct btrfs_block_group_cache *cache)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct rb_node *node;
 
 	spin_lock(&fs_info->block_group_cache_lock);
@@ -9710,8 +9709,7 @@ void btrfs_put_block_group_cache(struct btrfs_fs_info *info)
 			if (block_group->iref)
 				break;
 			spin_unlock(&block_group->lock);
-			block_group = next_block_group(info->tree_root,
-						       block_group);
+			block_group = next_block_group(info, block_group);
 		}
 		if (!block_group) {
 			if (last == 0)
@@ -10922,7 +10920,7 @@ int btrfs_trim_fs(struct btrfs_fs_info *fs_info, struct fstrim_range *range)
 			}
 		}
 
-		cache = next_block_group(fs_info->tree_root, cache);
+		cache = next_block_group(fs_info, cache);
 	}
 
 	mutex_lock(&fs_info->fs_devices->device_list_mutex);
