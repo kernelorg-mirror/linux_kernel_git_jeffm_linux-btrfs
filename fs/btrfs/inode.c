@@ -5411,13 +5411,12 @@ out_err:
  * needs to be changed to reflect the root directory of the tree root.  This
  * is kind of like crossing a mount point.
  */
-static int fixup_tree_root_location(struct btrfs_root *root,
+static int fixup_tree_root_location(struct btrfs_fs_info *fs_info,
 				    struct inode *dir,
 				    struct dentry *dentry,
 				    struct btrfs_key *location,
 				    struct btrfs_root **sub_root)
 {
-	struct btrfs_fs_info *fs_info = btrfs_sb(dir->i_sb);
 	struct btrfs_path *path;
 	struct btrfs_root *new_root;
 	struct btrfs_root_ref *ref;
@@ -5717,7 +5716,7 @@ struct inode *btrfs_lookup_dentry(struct inode *dir, struct dentry *dentry)
 	BUG_ON(location.type != BTRFS_ROOT_ITEM_KEY);
 
 	index = srcu_read_lock(&fs_info->subvol_srcu);
-	ret = fixup_tree_root_location(root, dir, dentry,
+	ret = fixup_tree_root_location(fs_info, dir, dentry,
 				       &location, &sub_root);
 	if (ret < 0) {
 		if (ret != -ENOENT)
