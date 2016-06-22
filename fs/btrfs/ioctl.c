@@ -4379,12 +4379,12 @@ out:
 	return ret;
 }
 
-static long btrfs_ioctl_scrub_cancel(struct btrfs_root *root, void __user *arg)
+static long btrfs_ioctl_scrub_cancel(struct btrfs_fs_info *fs_info)
 {
 	if (!capable(CAP_SYS_ADMIN))
 		return -EPERM;
 
-	return btrfs_scrub_cancel(root->fs_info);
+	return btrfs_scrub_cancel(fs_info);
 }
 
 static long btrfs_ioctl_scrub_progress(struct btrfs_fs_info *fs_info,
@@ -5612,7 +5612,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_SCRUB:
 		return btrfs_ioctl_scrub(file, argp);
 	case BTRFS_IOC_SCRUB_CANCEL:
-		return btrfs_ioctl_scrub_cancel(root, argp);
+		return btrfs_ioctl_scrub_cancel(fs_info);
 	case BTRFS_IOC_SCRUB_PROGRESS:
 		return btrfs_ioctl_scrub_progress(fs_info, argp);
 	case BTRFS_IOC_BALANCE_V2:
