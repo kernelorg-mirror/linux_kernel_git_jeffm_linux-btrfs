@@ -4559,7 +4559,7 @@ static int build_ino_list(u64 inum, u64 offset, u64 root, void *ctx)
 	return 0;
 }
 
-static long btrfs_ioctl_logical_to_ino(struct btrfs_root *root,
+static long btrfs_ioctl_logical_to_ino(struct btrfs_fs_info *fs_info,
 					void __user *arg)
 {
 	int ret = 0;
@@ -4592,7 +4592,7 @@ static long btrfs_ioctl_logical_to_ino(struct btrfs_root *root,
 		goto out;
 	}
 
-	ret = iterate_inodes_from_logical(loi->logical, root->fs_info, path,
+	ret = iterate_inodes_from_logical(loi->logical, fs_info, path,
 					  build_ino_list, inodes);
 	if (ret == -EINVAL)
 		ret = -ENOENT;
@@ -5587,7 +5587,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_INO_PATHS:
 		return btrfs_ioctl_ino_to_path(root, argp);
 	case BTRFS_IOC_LOGICAL_INO:
-		return btrfs_ioctl_logical_to_ino(root, argp);
+		return btrfs_ioctl_logical_to_ino(fs_info, argp);
 	case BTRFS_IOC_SPACE_INFO:
 		return btrfs_ioctl_space_info(root, argp);
 	case BTRFS_IOC_SYNC: {
