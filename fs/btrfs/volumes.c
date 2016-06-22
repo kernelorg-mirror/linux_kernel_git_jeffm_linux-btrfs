@@ -1796,9 +1796,8 @@ void btrfs_assign_next_active_device(struct btrfs_fs_info *fs_info,
 		fs_info->fs_devices->latest_bdev = next_device->bdev;
 }
 
-int btrfs_rm_device(struct btrfs_root *root, char *device_path, u64 devid)
+int btrfs_rm_device(struct btrfs_fs_info *fs_info, char *device_path, u64 devid)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_device *device;
 	struct btrfs_fs_devices *cur_devices;
 	u64 num_devices;
