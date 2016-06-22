@@ -4677,10 +4677,9 @@ void btrfs_truncate_item(struct btrfs_root *root, struct btrfs_path *path,
 /*
  * make the item pointed to by the path bigger, data_size is the added size.
  */
-void btrfs_extend_item(struct btrfs_root *root, struct btrfs_path *path,
+void btrfs_extend_item(struct btrfs_fs_info *fs_info, struct btrfs_path *path,
 		       u32 data_size)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int slot;
 	struct extent_buffer *leaf;
 	struct btrfs_item *item;
