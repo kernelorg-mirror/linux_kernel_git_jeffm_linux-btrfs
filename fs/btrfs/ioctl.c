@@ -4788,10 +4788,8 @@ out:
 	return ret;
 }
 
-static long btrfs_ioctl_balance_ctl(struct btrfs_root *root, int cmd)
+static long btrfs_ioctl_balance_ctl(struct btrfs_fs_info *fs_info, int cmd)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	if (!capable(CAP_SYS_ADMIN))
 		return -EPERM;
 
@@ -4805,10 +4803,9 @@ static long btrfs_ioctl_balance_ctl(struct btrfs_root *root, int cmd)
 	return -EINVAL;
 }
 
-static long btrfs_ioctl_balance_progress(struct btrfs_root *root,
+static long btrfs_ioctl_balance_progress(struct btrfs_fs_info *fs_info,
 					 void __user *arg)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_ioctl_balance_args *bargs;
 	int ret = 0;
 
@@ -5621,9 +5618,9 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_BALANCE_V2:
 		return btrfs_ioctl_balance(file, argp);
 	case BTRFS_IOC_BALANCE_CTL:
-		return btrfs_ioctl_balance_ctl(root, arg);
+		return btrfs_ioctl_balance_ctl(fs_info, arg);
 	case BTRFS_IOC_BALANCE_PROGRESS:
-		return btrfs_ioctl_balance_progress(root, argp);
+		return btrfs_ioctl_balance_progress(fs_info, argp);
 	case BTRFS_IOC_SET_RECEIVED_SUBVOL:
 		return btrfs_ioctl_set_received_subvol(file, argp);
 #ifdef CONFIG_64BIT
