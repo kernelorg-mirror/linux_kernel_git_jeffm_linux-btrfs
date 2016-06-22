@@ -6439,10 +6439,9 @@ static void fill_device_from_item(struct extent_buffer *leaf,
 	read_extent_buffer(leaf, device->uuid, ptr, BTRFS_UUID_SIZE);
 }
 
-static struct btrfs_fs_devices *open_seed_devices(struct btrfs_root *root,
+static struct btrfs_fs_devices *open_seed_devices(struct btrfs_fs_info *fs_info,
 						  u8 *fsid)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_fs_devices *fs_devices;
 	int ret;
 
@@ -6495,11 +6494,10 @@ out:
 	return fs_devices;
 }
 
-static int read_one_dev(struct btrfs_root *root,
+static int read_one_dev(struct btrfs_fs_info *fs_info,
 			struct extent_buffer *leaf,
 			struct btrfs_dev_item *dev_item)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
 	struct btrfs_device *device;
 	u64 devid;
@@ -6514,7 +6512,7 @@ static int read_one_dev(struct btrfs_root *root,
 			   BTRFS_UUID_SIZE);
 
 	if (memcmp(fs_uuid, fs_info->fsid, BTRFS_UUID_SIZE)) {
-		fs_devices = open_seed_devices(root, fs_uuid);
+		fs_devices = open_seed_devices(fs_info, fs_uuid);
 		if (IS_ERR(fs_devices))
 			return PTR_ERR(fs_devices);
 	}
@@ -6745,7 +6743,7 @@ int btrfs_read_chunk_tree(struct btrfs_fs_info *fs_info)
 			struct btrfs_dev_item *dev_item;
 			dev_item = btrfs_item_ptr(leaf, slot,
 						  struct btrfs_dev_item);
-			ret = read_one_dev(root, leaf, dev_item);
+			ret = read_one_dev(fs_info, leaf, dev_item);
 			if (ret)
 				goto error;
 			total_dev++;
