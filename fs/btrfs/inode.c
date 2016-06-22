@@ -3163,9 +3163,8 @@ void btrfs_add_delayed_iput(struct inode *inode)
 	spin_unlock(&fs_info->delayed_iput_lock);
 }
 
-void btrfs_run_delayed_iputs(struct btrfs_root *root)
+void btrfs_run_delayed_iputs(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 
 	spin_lock(&fs_info->delayed_iput_lock);
 	while (!list_empty(&fs_info->delayed_iputs)) {

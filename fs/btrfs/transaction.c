@@ -909,7 +909,7 @@ static int __btrfs_end_transaction(struct btrfs_trans_handle *trans,
 		current->journal_info = NULL;
 
 	if (throttle)
-		btrfs_run_delayed_iputs(root);
+		btrfs_run_delayed_iputs(info);
 
 	if (trans->aborted ||
 	    test_bit(BTRFS_FS_STATE_ERROR, &info->fs_state)) {
@@ -2300,7 +2300,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 
 	if (current != fs_info->transaction_kthread &&
 	    current != fs_info->cleaner_kthread)
-		btrfs_run_delayed_iputs(root);
+		btrfs_run_delayed_iputs(fs_info);
 
 	return ret;
 

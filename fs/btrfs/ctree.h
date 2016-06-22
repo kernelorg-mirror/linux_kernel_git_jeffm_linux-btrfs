@@ -3144,7 +3144,7 @@ void btrfs_orphan_commit_root(struct btrfs_trans_handle *trans,
 int btrfs_cont_expand(struct inode *inode, loff_t oldsize, loff_t size);
 void btrfs_invalidate_inodes(struct btrfs_root *root);
 void btrfs_add_delayed_iput(struct inode *inode);
-void btrfs_run_delayed_iputs(struct btrfs_root *root);
+void btrfs_run_delayed_iputs(struct btrfs_fs_info *fs_info);
 int btrfs_prealloc_file_range(struct inode *inode, int mode,
 			      u64 start, u64 num_bytes, u64 min_size,
 			      loff_t actual_len, u64 *alloc_hint);
