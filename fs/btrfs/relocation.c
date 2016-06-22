@@ -3442,7 +3442,7 @@ static int block_use_full_backref(struct reloc_control *rc,
 	    btrfs_header_backref_rev(eb) < BTRFS_MIXED_BACKREF_REV)
 		return 1;
 
-	ret = btrfs_lookup_extent_info(NULL, rc->extent_root,
+	ret = btrfs_lookup_extent_info(NULL, rc->extent_root->fs_info,
 				       eb->start, btrfs_header_level(eb), 1,
 				       NULL, &flags);
 	BUG_ON(ret);
