@@ -136,7 +136,7 @@ const int btrfs_raid_mindev_error[BTRFS_NR_RAID_TYPES] = {
 static int init_first_rw_device(struct btrfs_trans_handle *trans,
 				struct btrfs_root *root,
 				struct btrfs_device *device);
-static int btrfs_relocate_sys_chunks(struct btrfs_root *root);
+static int btrfs_relocate_sys_chunks(struct btrfs_fs_info *fs_info);
 static void __btrfs_reset_dev_stats(struct btrfs_device *dev);
 static void btrfs_dev_stat_print_on_error(struct btrfs_device *dev);
 static void btrfs_dev_stat_print_on_load(struct btrfs_device *device);
@@ -2438,7 +2438,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, char *device_path)
 		if (ret) /* transaction commit */
 			return ret;
 
-		ret = btrfs_relocate_sys_chunks(root);
+		ret = btrfs_relocate_sys_chunks(fs_info);
 		if (ret < 0)
 			btrfs_handle_fs_error(fs_info, ret,
 					      "Failed to relocate sys chunks after "
@@ -2899,9 +2899,8 @@ static int btrfs_relocate_chunk(struct btrfs_fs_info *fs_info, u64 chunk_offset)
 	return ret;
 }
 
-static int btrfs_relocate_sys_chunks(struct btrfs_root *root)
+static int btrfs_relocate_sys_chunks(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_root *chunk_root = fs_info->chunk_root;
 	struct btrfs_path *path;
 	struct extent_buffer *leaf;
