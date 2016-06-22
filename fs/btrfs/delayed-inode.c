@@ -1405,12 +1405,9 @@ static int could_end_wait(struct btrfs_delayed_root *delayed_root, int seq)
 	return 0;
 }
 
-void btrfs_balance_delayed_items(struct btrfs_root *root)
+void btrfs_balance_delayed_items(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_delayed_root *delayed_root;
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
-	delayed_root = fs_info->delayed_root;
+	struct btrfs_delayed_root *delayed_root = fs_info->delayed_root;
 
 	if (atomic_read(&delayed_root->items) < BTRFS_DELAYED_BACKGROUND)
 		return;

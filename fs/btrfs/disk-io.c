@@ -4034,7 +4034,7 @@ static void __btrfs_btree_balance_dirty(struct btrfs_root *root,
 		return;
 
 	if (flush_delayed)
-		btrfs_balance_delayed_items(root);
+		btrfs_balance_delayed_items(fs_info);
 
 	ret = percpu_counter_compare(&fs_info->dirty_metadata_bytes,
 				     BTRFS_DIRTY_METADATA_THRESH);

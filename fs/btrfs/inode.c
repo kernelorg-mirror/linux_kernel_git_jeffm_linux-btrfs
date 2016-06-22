@@ -6018,6 +6018,7 @@ int btrfs_write_inode(struct inode *inode, struct writeback_control *wbc)
  */
 static int btrfs_dirty_inode(struct inode *inode)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	struct btrfs_root *root = BTRFS_I(inode)->root;
 	struct btrfs_trans_handle *trans;
 	int ret;
@@ -6041,7 +6042,7 @@ static int btrfs_dirty_inode(struct inode *inode)
 	}
 	btrfs_end_transaction(trans, root);
 	if (BTRFS_I(inode)->delayed_node)
-		btrfs_balance_delayed_items(root);
+		btrfs_balance_delayed_items(fs_info);
 
 	return ret;
 }
@@ -6424,6 +6425,7 @@ static int btrfs_add_nondir(struct btrfs_trans_handle *trans,
 static int btrfs_mknod(struct inode *dir, struct dentry *dentry,
 			umode_t mode, dev_t rdev)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(dir->i_sb);
 	struct btrfs_trans_handle *trans;
 	struct btrfs_root *root = BTRFS_I(dir)->root;
 	struct inode *inode = NULL;
@@ -6477,7 +6479,7 @@ static int btrfs_mknod(struct inode *dir, struct dentry *dentry,
 
 out_unlock:
 	btrfs_end_transaction(trans, root);
-	btrfs_balance_delayed_items(root);
+	btrfs_balance_delayed_items(fs_info);
 	btrfs_btree_balance_dirty(root);
 	if (drop_inode) {
 		inode_dec_link_count(inode);
@@ -6495,6 +6497,7 @@ out_unlock_inode:
 static int btrfs_create(struct inode *dir, struct dentry *dentry,
 			umode_t mode, bool excl)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(dir->i_sb);
 	struct btrfs_trans_handle *trans;
 	struct btrfs_root *root = BTRFS_I(dir)->root;
 	struct inode *inode = NULL;
@@ -6556,7 +6559,7 @@ out_unlock:
 		inode_dec_link_count(inode);
 		iput(inode);
 	}
-	btrfs_balance_delayed_items(root);
+	btrfs_balance_delayed_items(fs_info);
 	btrfs_btree_balance_dirty(root);
 	return err;
 
@@ -6572,6 +6575,7 @@ static int btrfs_link(struct dentry *old_dentry, struct inode *dir,
 	struct btrfs_trans_handle *trans = NULL;
 	struct btrfs_root *root = BTRFS_I(dir)->root;
 	struct inode *inode = d_inode(old_dentry);
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	u64 index;
 	int err;
 	int drop_inode = 0;
@@ -6629,7 +6633,7 @@ static int btrfs_link(struct dentry *old_dentry, struct inode *dir,
 		btrfs_log_new_name(trans, inode, NULL, parent);
 	}
 
-	btrfs_balance_delayed_items(root);
+	btrfs_balance_delayed_items(fs_info);
 fail:
 	if (trans)
 		btrfs_end_transaction(trans, root);
@@ -6643,6 +6647,7 @@ fail:
 
 static int btrfs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(dir->i_sb);
 	struct inode *inode = NULL;
 	struct btrfs_trans_handle *trans;
 	struct btrfs_root *root = BTRFS_I(dir)->root;
@@ -6705,7 +6710,7 @@ out_fail:
 		inode_dec_link_count(inode);
 		iput(inode);
 	}
-	btrfs_balance_delayed_items(root);
+	btrfs_balance_delayed_items(fs_info);
 	btrfs_btree_balance_dirty(root);
 	return err;
 
@@ -10489,6 +10494,7 @@ static int btrfs_permission(struct inode *inode, int mask)
 
 static int btrfs_tmpfile(struct inode *dir, struct dentry *dentry, umode_t mode)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(dir->i_sb);
 	struct btrfs_trans_handle *trans;
 	struct btrfs_root *root = BTRFS_I(dir)->root;
 	struct inode *inode = NULL;
@@ -10548,7 +10554,7 @@ out:
 	btrfs_end_transaction(trans, root);
 	if (ret)
 		iput(inode);
-	btrfs_balance_delayed_items(root);
+	btrfs_balance_delayed_items(fs_info);
 	btrfs_btree_balance_dirty(root);
 	return ret;
 
