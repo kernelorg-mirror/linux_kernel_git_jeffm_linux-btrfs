@@ -98,7 +98,7 @@ static int alloc_reserved_tree_block(struct btrfs_trans_handle *trans,
 				     u64 flags, struct btrfs_disk_key *key,
 				     int level, struct btrfs_key *ins);
 static int do_chunk_alloc(struct btrfs_trans_handle *trans,
-			  struct btrfs_root *extent_root, u64 flags,
+			  struct btrfs_fs_info *fs_info, u64 flags,
 			  int force);
 static int find_next_key(struct btrfs_path *path, int level,
 			 struct btrfs_key *key);
@@ -4189,8 +4189,7 @@ alloc:
 			if (IS_ERR(trans))
 				return PTR_ERR(trans);
 
-			ret = do_chunk_alloc(trans, fs_info->extent_root,
-					     alloc_target,
+			ret = do_chunk_alloc(trans, fs_info, alloc_target,
 					     CHUNK_ALLOC_NO_FORCE);
 			btrfs_end_transaction(trans, root);
 			if (ret < 0) {
@@ -4471,10 +4470,9 @@ void check_system_chunk(struct btrfs_trans_handle *trans,
 }
 
 static int do_chunk_alloc(struct btrfs_trans_handle *trans,
-			  struct btrfs_root *extent_root, u64 flags, int force)
+			  struct btrfs_fs_info *fs_info, u64 flags, int force)
 {
 	struct btrfs_space_info *space_info;
-	struct btrfs_fs_info *fs_info = extent_root->fs_info;
 	int wait_for_alloc = 0;
 	int ret = 0;
 
@@ -4876,7 +4874,7 @@ static int flush_space(struct btrfs_root *root,
 			ret = PTR_ERR(trans);
 			break;
 		}
-		ret = do_chunk_alloc(trans, fs_info->extent_root,
+		ret = do_chunk_alloc(trans, fs_info,
 				     btrfs_get_alloc_profile(root, 0),
 				     CHUNK_ALLOC_NO_FORCE);
 		btrfs_end_transaction(trans, root);
@@ -7833,7 +7831,7 @@ loop:
 				goto out;
 			}
 
-			ret = do_chunk_alloc(trans, root, flags,
+			ret = do_chunk_alloc(trans, fs_info, flags,
 					     CHUNK_ALLOC_FORCE);
 
 			/*
@@ -9616,7 +9614,7 @@ again:
 	 */
 	alloc_flags = update_block_group_flags(fs_info, cache->flags);
 	if (alloc_flags != cache->flags) {
-		ret = do_chunk_alloc(trans, root, alloc_flags,
+		ret = do_chunk_alloc(trans, fs_info, alloc_flags,
 				     CHUNK_ALLOC_FORCE);
 		/*
 		 * ENOSPC is allowed here, we may have enough space
@@ -9633,7 +9631,7 @@ again:
 	if (!ret)
 		goto out;
 	alloc_flags = get_alloc_profile(fs_info, cache->space_info->flags);
-	ret = do_chunk_alloc(trans, root, alloc_flags,
+	ret = do_chunk_alloc(trans, fs_info, alloc_flags,
 			     CHUNK_ALLOC_FORCE);
 	if (ret < 0)
 		goto out;
@@ -9654,9 +9652,10 @@ out:
 int btrfs_force_chunk_alloc(struct btrfs_trans_handle *trans,
 			    struct btrfs_root *root, u64 type)
 {
-	u64 alloc_flags = get_alloc_profile(root->fs_info, type);
-	return do_chunk_alloc(trans, root, alloc_flags,
-			      CHUNK_ALLOC_FORCE);
+	struct btrfs_fs_info *fs_info = root->fs_info;
+	u64 alloc_flags = get_alloc_profile(fs_info, type);
+
+	return do_chunk_alloc(trans, fs_info, alloc_flags, CHUNK_ALLOC_FORCE);
 }
 
 /*
