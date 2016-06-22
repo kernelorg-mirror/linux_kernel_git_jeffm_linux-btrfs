@@ -793,10 +793,9 @@ void btrfs_throttle(struct btrfs_root *root)
 		wait_current_trans(root);
 }
 
-static int should_end_transaction(struct btrfs_trans_handle *trans,
-				  struct btrfs_root *root)
+static int should_end_transaction(struct btrfs_trans_handle *trans)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
+	struct btrfs_fs_info *fs_info = trans->fs_info;
 
 	if (fs_info->global_block_rsv.space_info->full &&
 	    btrfs_check_space_for_delayed_refs(trans, fs_info))
@@ -825,7 +824,7 @@ int btrfs_should_end_transaction(struct btrfs_trans_handle *trans,
 			return err;
 	}
 
-	return should_end_transaction(trans, root);
+	return should_end_transaction(trans);
 }
 
 static int __btrfs_end_transaction(struct btrfs_trans_handle *trans,
@@ -875,7 +874,7 @@ static int __btrfs_end_transaction(struct btrfs_trans_handle *trans,
 	btrfs_trans_release_chunk_metadata(trans);
 
 	if (lock && !atomic_read(&info->open_ioctl_trans) &&
-	    should_end_transaction(trans, root) &&
+	    should_end_transaction(trans) &&
 	    ACCESS_ONCE(cur_trans->state) == TRANS_STATE_RUNNING) {
 		spin_lock(&info->trans_lock);
 		if (cur_trans->state == TRANS_STATE_RUNNING)
