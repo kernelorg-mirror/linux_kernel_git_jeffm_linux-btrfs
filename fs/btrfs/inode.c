@@ -4264,7 +4264,7 @@ static int truncate_space_check(struct btrfs_trans_handle *trans,
 	 * This is only used to apply pressure to the enospc system, we don't
 	 * intend to use this reservation at all.
 	 */
-	bytes_deleted = btrfs_csum_bytes_to_leaves(root, bytes_deleted);
+	bytes_deleted = btrfs_csum_bytes_to_leaves(fs_info, bytes_deleted);
 	bytes_deleted *= fs_info->nodesize;
 	ret = btrfs_block_rsv_add(root, &fs_info->trans_block_rsv,
 				  bytes_deleted, BTRFS_RESERVE_NO_FLUSH);
