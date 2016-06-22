@@ -553,12 +553,11 @@ int btrfs_csum_one_bio(struct inode *inode, struct bio *bio,
  * This calls btrfs_truncate_item with the correct args based on the
  * overlap, and fixes up the key as required.
  */
-static noinline void truncate_one_csum(struct btrfs_root *root,
+static noinline void truncate_one_csum(struct btrfs_fs_info *fs_info,
 				       struct btrfs_path *path,
 				       struct btrfs_key *key,
 				       u64 bytenr, u64 len)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *leaf;
 	u16 csum_size = btrfs_super_csum_size(fs_info->super_copy);
 	u64 csum_end;
@@ -708,7 +707,7 @@ int btrfs_del_csums(struct btrfs_trans_handle *trans,
 
 			key.offset = end_byte - 1;
 		} else {
-			truncate_one_csum(root, path, &key, bytenr, len);
+			truncate_one_csum(fs_info, path, &key, bytenr, len);
 			if (key.offset < bytenr)
 				break;
 		}
