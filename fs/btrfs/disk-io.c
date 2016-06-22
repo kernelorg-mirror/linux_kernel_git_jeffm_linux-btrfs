@@ -1104,10 +1104,9 @@ void readahead_tree_block(struct btrfs_fs_info *fs_info, u64 bytenr)
 	free_extent_buffer(buf);
 }
 
-int reada_tree_block_flagged(struct btrfs_root *root, u64 bytenr,
+int reada_tree_block_flagged(struct btrfs_fs_info *fs_info, u64 bytenr,
 			 int mirror_num, struct extent_buffer **eb)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *buf = NULL;
 	struct inode *btree_inode = fs_info->btree_inode;
 	struct extent_io_tree *io_tree = &BTRFS_I(btree_inode)->io_tree;
