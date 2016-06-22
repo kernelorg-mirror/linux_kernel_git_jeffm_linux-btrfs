@@ -1802,6 +1802,7 @@ static noinline int replay_one_dir_item(struct btrfs_trans_handle *trans,
 					struct extent_buffer *eb, int slot,
 					struct btrfs_key *key)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret = 0;
 	u32 item_size = btrfs_item_size_nr(eb, slot);
 	struct btrfs_dir_item *di;
@@ -1814,7 +1815,7 @@ static noinline int replay_one_dir_item(struct btrfs_trans_handle *trans,
 	ptr_end = ptr + item_size;
 	while (ptr < ptr_end) {
 		di = (struct btrfs_dir_item *)ptr;
-		if (verify_dir_item(root, eb, di))
+		if (verify_dir_item(fs_info, eb, di))
 			return -EIO;
 		name_len = btrfs_dir_name_len(eb, di);
 		ret = replay_one_name(trans, root, path, eb, di, key);
@@ -1991,7 +1992,7 @@ again:
 	ptr_end = ptr + item_size;
 	while (ptr < ptr_end) {
 		di = (struct btrfs_dir_item *)ptr;
-		if (verify_dir_item(root, eb, di)) {
+		if (verify_dir_item(fs_info, eb, di)) {
 			ret = -EIO;
 			goto out;
 		}

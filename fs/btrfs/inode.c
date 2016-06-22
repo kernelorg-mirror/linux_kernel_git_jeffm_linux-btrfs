@@ -5791,6 +5791,7 @@ unsigned char btrfs_filetype_table[] = {
 static int btrfs_real_readdir(struct file *file, struct dir_context *ctx)
 {
 	struct inode *inode = file_inode(file);
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	struct btrfs_root *root = BTRFS_I(inode)->root;
 	struct btrfs_item *item;
 	struct btrfs_dir_item *di;
@@ -5816,7 +5817,7 @@ static int btrfs_real_readdir(struct file *file, struct dir_context *ctx)
 	bool put = false;
 
 	/* FIXME, use a real flag for deciding about the key type */
-	if (root->fs_info->tree_root == root)
+	if (fs_info->tree_root == root)
 		key_type = BTRFS_DIR_ITEM_KEY;
 
 	if (!dir_emit_dots(file, ctx))
@@ -5880,7 +5881,7 @@ static int btrfs_real_readdir(struct file *file, struct dir_context *ctx)
 		while (di_cur < di_total) {
 			struct btrfs_key location;
 
-			if (verify_dir_item(root, leaf, di))
+			if (verify_dir_item(fs_info, leaf, di))
 				break;
 
 			name_len = btrfs_dir_name_len(leaf, di);
