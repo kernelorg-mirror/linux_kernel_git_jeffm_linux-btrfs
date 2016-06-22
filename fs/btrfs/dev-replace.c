@@ -302,11 +302,11 @@ void btrfs_after_dev_replace_commit(struct btrfs_fs_info *fs_info)
 		dev_replace->cursor_left_last_write_of_item;
 }
 
-int btrfs_dev_replace_start(struct btrfs_root *root, char *tgtdev_name,
+int btrfs_dev_replace_start(struct btrfs_fs_info *fs_info, char *tgtdev_name,
 				u64 srcdevid, char *srcdev_name, int read_src)
 {
+	struct btrfs_root *root = fs_info->dev_root;
 	struct btrfs_trans_handle *trans;
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_dev_replace *dev_replace = &fs_info->dev_replace;
 	int ret;
 	struct btrfs_device *tgt_device = NULL;
@@ -420,7 +420,7 @@ leave:
 	return ret;
 }
 
-int btrfs_dev_replace_by_ioctl(struct btrfs_root *root,
+int btrfs_dev_replace_by_ioctl(struct btrfs_fs_info *fs_info,
 			    struct btrfs_ioctl_dev_replace_args *args)
 {
 	int ret;
@@ -437,7 +437,7 @@ int btrfs_dev_replace_by_ioctl(struct btrfs_root *root,
 	    args->start.tgtdev_name[0] == '\0')
 		return -EINVAL;
 
-	ret = btrfs_dev_replace_start(root, args->start.tgtdev_name,
+	ret = btrfs_dev_replace_start(fs_info, args->start.tgtdev_name,
 					args->start.srcdevid,
 					args->start.srcdev_name,
 					args->start.cont_reading_from_srcdev_mode);

@@ -4433,9 +4433,9 @@ static long btrfs_ioctl_get_dev_stats(struct btrfs_fs_info *fs_info,
 	return ret;
 }
 
-static long btrfs_ioctl_dev_replace(struct btrfs_root *root, void __user *arg)
+static long btrfs_ioctl_dev_replace(struct btrfs_fs_info *fs_info,
+				    void __user *arg)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_ioctl_dev_replace_args *p;
 	int ret;
 
@@ -4456,7 +4456,7 @@ static long btrfs_ioctl_dev_replace(struct btrfs_root *root, void __user *arg)
 			&fs_info->mutually_exclusive_operation_running, 1)) {
 			ret = BTRFS_ERROR_DEV_EXCL_RUN_IN_PROGRESS;
 		} else {
-			ret = btrfs_dev_replace_by_ioctl(root, p);
+			ret = btrfs_dev_replace_by_ioctl(fs_info, p);
 			atomic_set(
 			 &fs_info->mutually_exclusive_operation_running, 0);
 		}
@@ -5650,7 +5650,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_QUOTA_RESCAN_WAIT:
 		return btrfs_ioctl_quota_rescan_wait(file, argp);
 	case BTRFS_IOC_DEV_REPLACE:
-		return btrfs_ioctl_dev_replace(root, argp);
+		return btrfs_ioctl_dev_replace(fs_info, argp);
 	case BTRFS_IOC_GET_FSLABEL:
 		return btrfs_ioctl_get_fslabel(file, argp);
 	case BTRFS_IOC_SET_FSLABEL:
