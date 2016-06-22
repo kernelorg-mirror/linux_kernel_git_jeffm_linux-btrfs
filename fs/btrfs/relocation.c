@@ -2993,7 +2993,7 @@ int relocate_tree_blocks(struct btrfs_trans_handle *trans,
 	while (rb_node) {
 		block = rb_entry(rb_node, struct tree_block, rb_node);
 		if (!block->key_ready)
-			readahead_tree_block(rc->extent_root, block->bytenr);
+			readahead_tree_block(fs_info, block->bytenr);
 		rb_node = rb_next(rb_node);
 	}
 
