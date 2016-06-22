@@ -111,9 +111,9 @@ int btrfs_delete_delayed_dir_index(struct btrfs_trans_handle *trans,
 int btrfs_inode_delayed_dir_index_count(struct inode *inode);
 
 int btrfs_run_delayed_items(struct btrfs_trans_handle *trans,
-			    struct btrfs_root *root);
+			    struct btrfs_fs_info *fs_info);
 int btrfs_run_delayed_items_nr(struct btrfs_trans_handle *trans,
-			       struct btrfs_root *root, int nr);
+			       struct btrfs_fs_info *fs_info, int nr);
 
 void btrfs_balance_delayed_items(struct btrfs_root *root);
 

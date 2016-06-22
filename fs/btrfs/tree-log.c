@@ -829,6 +829,7 @@ static noinline int drop_one_dir_item(struct btrfs_trans_handle *trans,
 				      struct inode *dir,
 				      struct btrfs_dir_item *di)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct inode *inode;
 	char *name;
 	int name_len;
@@ -861,7 +862,7 @@ static noinline int drop_one_dir_item(struct btrfs_trans_handle *trans,
 	if (ret)
 		goto out;
 	else
-		ret = btrfs_run_delayed_items(trans, root);
+		ret = btrfs_run_delayed_items(trans, fs_info);
 out:
 	kfree(name);
 	iput(inode);
@@ -979,6 +980,7 @@ static inline int __add_inode_ref(struct btrfs_trans_handle *trans,
 				  u64 ref_index, char *name, int namelen,
 				  int *search_done)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	char *victim_name;
 	int victim_name_len;
@@ -1037,7 +1039,7 @@ again:
 				kfree(victim_name);
 				if (ret)
 					return ret;
-				ret = btrfs_run_delayed_items(trans, root);
+				ret = btrfs_run_delayed_items(trans, fs_info);
 				if (ret)
 					return ret;
 				*search_done = 1;
@@ -1108,7 +1110,8 @@ again:
 								 victim_name_len);
 					if (!ret)
 						ret = btrfs_run_delayed_items(
-								  trans, root);
+								  trans,
+								  fs_info);
 				}
 				iput(victim_parent);
 				kfree(victim_name);
@@ -1966,6 +1969,7 @@ static noinline int check_item_in_log(struct btrfs_trans_handle *trans,
 				      struct inode *dir,
 				      struct btrfs_key *dir_key)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	struct extent_buffer *eb;
 	int slot;
@@ -2034,7 +2038,7 @@ again:
 			ret = btrfs_unlink_inode(trans, root, dir, inode,
 						 name, name_len);
 			if (!ret)
-				ret = btrfs_run_delayed_items(trans, root);
+				ret = btrfs_run_delayed_items(trans, fs_info);
 			kfree(name);
 			iput(inode);
 			if (ret)
