@@ -4654,10 +4654,9 @@ static int can_overcommit(struct btrfs_root *root,
 	return 0;
 }
 
-static void btrfs_writeback_inodes_sb_nr(struct btrfs_root *root,
+static void btrfs_writeback_inodes_sb_nr(struct btrfs_fs_info *fs_info,
 					 unsigned long nr_pages, int nr_items)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct super_block *sb = fs_info->sb;
 
 	if (down_read_trylock(&sb->s_umount)) {
@@ -4731,7 +4730,7 @@ static void shrink_delalloc(struct btrfs_root *root, u64 to_reclaim, u64 orig,
 	while (delalloc_bytes && loops < 3) {
 		max_reclaim = min(delalloc_bytes, to_reclaim);
 		nr_pages = max_reclaim >> PAGE_SHIFT;
-		btrfs_writeback_inodes_sb_nr(root, nr_pages, items);
+		btrfs_writeback_inodes_sb_nr(fs_info, nr_pages, items);
 		/*
 		 * We need to wait for the async pages to actually start before
 		 * we do anything.
