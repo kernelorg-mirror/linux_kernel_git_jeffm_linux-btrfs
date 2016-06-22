@@ -3689,7 +3689,7 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 		btrfs_dev_replace_unlock(&fs_info->dev_replace, 1);
 
 		if (ro_set)
-			btrfs_dec_block_group_ro(root, cache);
+			btrfs_dec_block_group_ro(cache);
 
 		/*
 		 * We might have prevented the cleaner kthread from deleting

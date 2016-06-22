@@ -2700,8 +2700,7 @@ void btrfs_block_rsv_release(struct btrfs_fs_info *fs_info,
 			     u64 num_bytes);
 int btrfs_inc_block_group_ro(struct btrfs_root *root,
 			     struct btrfs_block_group_cache *cache);
-void btrfs_dec_block_group_ro(struct btrfs_root *root,
-			      struct btrfs_block_group_cache *cache);
+void btrfs_dec_block_group_ro(struct btrfs_block_group_cache *cache);
 void btrfs_put_block_group_cache(struct btrfs_fs_info *info);
 u64 btrfs_account_ro_block_groups_free_space(struct btrfs_space_info *sinfo);
 int btrfs_error_unpin_extent_range(struct btrfs_root *root,
