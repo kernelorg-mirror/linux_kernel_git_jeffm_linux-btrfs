@@ -2854,14 +2854,12 @@ out:
 	return ret;
 }
 
-static int btrfs_relocate_chunk(struct btrfs_root *root, u64 chunk_offset)
+static int btrfs_relocate_chunk(struct btrfs_fs_info *fs_info, u64 chunk_offset)
 {
-	struct btrfs_root *extent_root;
+	struct btrfs_root *root = fs_info->chunk_root;
+	struct btrfs_root *extent_root = fs_info->extent_root;
 	struct btrfs_trans_handle *trans;
 	int ret;
-
-	root = root->fs_info->chunk_root;
-	extent_root = root->fs_info->extent_root;
 
 	/*
 	 * Prevent races with automatic removal of unused block groups.
@@ -2954,7 +2952,7 @@ again:
 		btrfs_release_path(path);
 
 		if (chunk_type & BTRFS_BLOCK_GROUP_SYSTEM) {
-			ret = btrfs_relocate_chunk(chunk_root,
+			ret = btrfs_relocate_chunk(root->fs_info,
 						   found_key.offset);
 			if (ret == -ENOSPC)
 				failed++;
@@ -3600,8 +3598,7 @@ again:
 			chunk_reserved = 1;
 		}
 
-		ret = btrfs_relocate_chunk(chunk_root,
-					   found_key.offset);
+		ret = btrfs_relocate_chunk(fs_info, found_key.offset);
 		mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 		if (ret && ret != -ENOSPC)
 			goto error;
@@ -4369,7 +4366,7 @@ again:
 		chunk_offset = btrfs_dev_extent_chunk_offset(l, dev_extent);
 		btrfs_release_path(path);
 
-		ret = btrfs_relocate_chunk(root, chunk_offset);
+		ret = btrfs_relocate_chunk(root->fs_info, chunk_offset);
 		mutex_unlock(&root->fs_info->delete_unused_bgs_mutex);
 		if (ret && ret != -ENOSPC)
 			goto done;
