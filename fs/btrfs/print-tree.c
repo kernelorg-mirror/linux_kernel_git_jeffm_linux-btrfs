@@ -169,9 +169,8 @@ static void print_uuid_item(struct extent_buffer *l, unsigned long offset,
 	}
 }
 
-void btrfs_print_leaf(struct btrfs_root *root, struct extent_buffer *l)
+void btrfs_print_leaf(struct btrfs_fs_info *fs_info, struct extent_buffer *l)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int i;
 	u32 type, nr;
 	struct btrfs_item *item;
@@ -343,7 +342,7 @@ void btrfs_print_tree(struct btrfs_root *root, struct extent_buffer *c)
 	nr = btrfs_header_nritems(c);
 	level = btrfs_header_level(c);
 	if (level == 0) {
-		btrfs_print_leaf(root, c);
+		btrfs_print_leaf(fs_info, c);
 		return;
 	}
 	btrfs_info(fs_info, "node %llu level %d total ptrs %d free spc %u",
