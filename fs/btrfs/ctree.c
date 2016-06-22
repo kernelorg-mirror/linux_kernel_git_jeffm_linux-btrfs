@@ -2253,11 +2253,10 @@ static noinline int push_nodes_for_insert(struct btrfs_trans_handle *trans,
  * readahead one full node of leaves, finding things that are close
  * to the block in 'slot', and triggering ra on them.
  */
-static void reada_for_search(struct btrfs_root *root,
+static void reada_for_search(struct btrfs_fs_info *fs_info,
 			     struct btrfs_path *path,
 			     int level, int slot, u64 objectid)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *node;
 	struct btrfs_disk_key disk_key;
 	u32 nritems;
@@ -2511,7 +2510,7 @@ read_block_for_search(struct btrfs_trans_handle *trans,
 
 	free_extent_buffer(tmp);
 	if (p->reada != READA_NONE)
-		reada_for_search(root, p, level, slot, key->objectid);
+		reada_for_search(fs_info, p, level, slot, key->objectid);
 
 	btrfs_release_path(p);
 
