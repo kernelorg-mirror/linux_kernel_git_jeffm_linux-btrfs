@@ -2302,16 +2302,16 @@ again:
 	trans = btrfs_join_transaction(rc->extent_root);
 	if (IS_ERR(trans)) {
 		if (!err)
-			btrfs_block_rsv_release(rc->extent_root,
-						rc->block_rsv, num_bytes);
+			btrfs_block_rsv_release(fs_info, rc->block_rsv,
+						num_bytes);
 		return PTR_ERR(trans);
 	}
 
 	if (!err) {
 		if (num_bytes != rc->merging_rsv_size) {
 			btrfs_end_transaction(trans, rc->extent_root);
-			btrfs_block_rsv_release(rc->extent_root,
-						rc->block_rsv, num_bytes);
+			btrfs_block_rsv_release(fs_info, rc->block_rsv,
+						num_bytes);
 			goto again;
 		}
 	}
@@ -3891,7 +3891,7 @@ int prepare_to_relocate(struct reloc_control *rc)
 	struct btrfs_trans_handle *trans;
 	int ret;
 
-	rc->block_rsv = btrfs_alloc_block_rsv(rc->extent_root,
+	rc->block_rsv = btrfs_alloc_block_rsv(rc->extent_root->fs_info,
 					      BTRFS_BLOCK_RSV_TEMP);
 	if (!rc->block_rsv)
 		return -ENOMEM;
@@ -3929,6 +3929,7 @@ int prepare_to_relocate(struct reloc_control *rc)
 
 static noinline_for_stack int relocate_block_group(struct reloc_control *rc)
 {
+	struct btrfs_fs_info *fs_info = rc->extent_root->fs_info;
 	struct rb_root blocks = RB_ROOT;
 	struct btrfs_key key;
 	struct btrfs_trans_handle *trans = NULL;
@@ -4101,7 +4102,7 @@ restart:
 	set_reloc_control(rc);
 
 	backref_cache_cleanup(&rc->backref_cache);
-	btrfs_block_rsv_release(rc->extent_root, rc->block_rsv, (u64)-1);
+	btrfs_block_rsv_release(fs_info, rc->block_rsv, (u64)-1);
 
 	err = prepare_to_merge(rc, err);
 
@@ -4109,7 +4110,7 @@ restart:
 
 	rc->merge_reloc_tree = 0;
 	unset_reloc_control(rc);
-	btrfs_block_rsv_release(rc->extent_root, rc->block_rsv, (u64)-1);
+	btrfs_block_rsv_release(fs_info, rc->block_rsv, (u64)-1);
 
 	/* get rid of pinned extents */
 	trans = btrfs_join_transaction(rc->extent_root);
@@ -4118,7 +4119,7 @@ restart:
 	else
 		btrfs_commit_transaction(trans, rc->extent_root);
 out_free:
-	btrfs_free_block_rsv(rc->extent_root, rc->block_rsv);
+	btrfs_free_block_rsv(fs_info, rc->block_rsv);
 	btrfs_free_path(path);
 	return err;
 }

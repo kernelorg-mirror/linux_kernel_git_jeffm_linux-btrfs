@@ -572,7 +572,7 @@ static void btrfs_delayed_item_release_metadata(struct btrfs_root *root,
 	trace_btrfs_space_reservation(fs_info, "delayed_item",
 				      item->key.objectid, item->bytes_reserved,
 				      0);
-	btrfs_block_rsv_release(root, rsv,
+	btrfs_block_rsv_release(fs_info, rsv,
 				item->bytes_reserved);
 }
 
@@ -672,7 +672,7 @@ static int btrfs_delayed_inode_reserve_metadata(
 	if (release) {
 		trace_btrfs_space_reservation(fs_info, "delalloc",
 					      btrfs_ino(inode), num_bytes, 0);
-		btrfs_block_rsv_release(root, src_rsv, num_bytes);
+		btrfs_block_rsv_release(fs_info, src_rsv, num_bytes);
 	}
 
 	return ret;
@@ -690,7 +690,7 @@ static void btrfs_delayed_inode_release_metadata(struct btrfs_root *root,
 	rsv = &fs_info->delayed_block_rsv;
 	trace_btrfs_space_reservation(fs_info, "delayed_inode",
 				      node->inode_id, node->bytes_reserved, 0);
-	btrfs_block_rsv_release(root, rsv,
+	btrfs_block_rsv_release(fs_info, rsv,
 				node->bytes_reserved);
 	node->bytes_reserved = 0;
 }
