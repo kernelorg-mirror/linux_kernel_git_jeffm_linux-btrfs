@@ -4332,7 +4332,7 @@ out:
 	return 0;
 }
 
-static noinline long btrfs_ioctl_wait_sync(struct btrfs_root *root,
+static noinline long btrfs_ioctl_wait_sync(struct btrfs_fs_info *fs_info,
 					   void __user *argp)
 {
 	u64 transid;
@@ -4343,7 +4343,7 @@ static noinline long btrfs_ioctl_wait_sync(struct btrfs_root *root,
 	} else {
 		transid = 0;  /* current trans */
 	}
-	return btrfs_wait_for_commit(root->fs_info, transid);
+	return btrfs_wait_for_commit(fs_info, transid);
 }
 
 static long btrfs_ioctl_scrub(struct file *file, void __user *arg)
@@ -5608,7 +5608,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_START_SYNC:
 		return btrfs_ioctl_start_sync(root, argp);
 	case BTRFS_IOC_WAIT_SYNC:
-		return btrfs_ioctl_wait_sync(root, argp);
+		return btrfs_ioctl_wait_sync(fs_info, argp);
 	case BTRFS_IOC_SCRUB:
 		return btrfs_ioctl_scrub(file, argp);
 	case BTRFS_IOC_SCRUB_CANCEL:
