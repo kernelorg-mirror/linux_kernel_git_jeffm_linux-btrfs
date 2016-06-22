@@ -4605,7 +4605,7 @@ delete:
 						btrfs_header_owner(leaf),
 						ino, extent_offset);
 			BUG_ON(ret);
-			if (btrfs_should_throttle_delayed_refs(trans, root))
+			if (btrfs_should_throttle_delayed_refs(trans, fs_info))
 				btrfs_async_run_delayed_refs(root,
 							     trans->transid,
 					trans->delayed_ref_updates * 2, 0);
@@ -4615,9 +4615,8 @@ delete:
 					should_end = 1;
 				}
 				if (btrfs_should_throttle_delayed_refs(trans,
-								       root)) {
+								       fs_info))
 					should_throttle = 1;
-				}
 			}
 		}
 
@@ -5313,7 +5312,7 @@ void btrfs_evict_inode(struct inode *inode)
 		 * again.
 		 */
 		if (steal_from_global) {
-			if (!btrfs_check_space_for_delayed_refs(trans, root))
+			if (!btrfs_check_space_for_delayed_refs(trans, fs_info))
 				ret = btrfs_block_rsv_migrate(global_rsv, rsv,
 							      min_size, 0);
 			else
