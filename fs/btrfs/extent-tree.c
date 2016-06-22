@@ -4064,9 +4064,8 @@ static u64 get_restripe_target(struct btrfs_fs_info *fs_info, u64 flags)
  * progress (either running or paused) picks the target profile (if it's
  * already available), otherwise falls back to plain reducing.
  */
-static u64 btrfs_reduce_alloc_profile(struct btrfs_root *root, u64 flags)
+static u64 btrfs_reduce_alloc_profile(struct btrfs_fs_info *fs_info, u64 flags)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 num_devices = fs_info->fs_devices->rw_devices;
 	u64 target;
 	u64 raid_type;
@@ -4110,9 +4109,8 @@ static u64 btrfs_reduce_alloc_profile(struct btrfs_root *root, u64 flags)
 	return extended_to_chunk(flags | allowed);
 }
 
-static u64 get_alloc_profile(struct btrfs_root *root, u64 orig_flags)
+static u64 get_alloc_profile(struct btrfs_fs_info *fs_info, u64 orig_flags)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	unsigned seq;
 	u64 flags;
 
@@ -4128,7 +4126,7 @@ static u64 get_alloc_profile(struct btrfs_root *root, u64 orig_flags)
 			flags |= fs_info->avail_metadata_alloc_bits;
 	} while (read_seqretry(&fs_info->profiles_lock, seq));
 
-	return btrfs_reduce_alloc_profile(root, flags);
+	return btrfs_reduce_alloc_profile(fs_info, flags);
 }
 
 u64 btrfs_get_alloc_profile(struct btrfs_root *root, int data)
@@ -4144,7 +4142,7 @@ u64 btrfs_get_alloc_profile(struct btrfs_root *root, int data)
 	else
 		flags = BTRFS_BLOCK_GROUP_METADATA;
 
-	ret = get_alloc_profile(root, flags);
+	ret = get_alloc_profile(fs_info, flags);
 	return ret;
 }
 
@@ -9660,7 +9658,7 @@ again:
 	ret = inc_block_group_ro(cache, 0);
 	if (!ret)
 		goto out;
-	alloc_flags = get_alloc_profile(root, cache->space_info->flags);
+	alloc_flags = get_alloc_profile(fs_info, cache->space_info->flags);
 	ret = do_chunk_alloc(trans, root, alloc_flags,
 			     CHUNK_ALLOC_FORCE);
 	if (ret < 0)
@@ -9682,7 +9680,7 @@ out:
 int btrfs_force_chunk_alloc(struct btrfs_trans_handle *trans,
 			    struct btrfs_root *root, u64 type)
 {
-	u64 alloc_flags = get_alloc_profile(root, type);
+	u64 alloc_flags = get_alloc_profile(root->fs_info, type);
 	return do_chunk_alloc(trans, root, alloc_flags,
 			      CHUNK_ALLOC_FORCE);
 }
@@ -10310,7 +10308,7 @@ int btrfs_read_block_groups(struct btrfs_fs_info *info)
 	}
 
 	list_for_each_entry_rcu(space_info, &info->space_info, list) {
-		if (!(get_alloc_profile(root, space_info->flags) &
+		if (!(get_alloc_profile(info, space_info->flags) &
 		      (BTRFS_BLOCK_GROUP_RAID10 |
 		       BTRFS_BLOCK_GROUP_RAID1 |
 		       BTRFS_BLOCK_GROUP_RAID5 |
