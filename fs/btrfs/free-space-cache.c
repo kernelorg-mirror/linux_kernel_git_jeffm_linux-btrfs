@@ -206,10 +206,9 @@ int create_free_space_inode(struct btrfs_root *root,
 					 block_group->key.objectid);
 }
 
-int btrfs_check_trunc_cache_free_space(struct btrfs_root *root,
+int btrfs_check_trunc_cache_free_space(struct btrfs_fs_info *fs_info,
 				       struct btrfs_block_rsv *rsv)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 needed_bytes;
 	int ret;
 
