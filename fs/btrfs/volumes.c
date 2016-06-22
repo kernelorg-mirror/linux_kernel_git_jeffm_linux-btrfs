@@ -4446,11 +4446,10 @@ done:
 	return ret;
 }
 
-static int btrfs_add_system_chunk(struct btrfs_root *root,
+static int btrfs_add_system_chunk(struct btrfs_fs_info *fs_info,
 			   struct btrfs_key *key,
 			   struct btrfs_chunk *chunk, int item_size)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_super_block *super_copy = fs_info->super_copy;
 	struct btrfs_disk_key disk_key;
 	u32 array_size;
@@ -4921,8 +4920,7 @@ int btrfs_finish_chunk_alloc(struct btrfs_trans_handle *trans,
 		 * TODO: Cleanup of inserted chunk root in case of
 		 * failure.
 		 */
-		ret = btrfs_add_system_chunk(chunk_root, &key, chunk,
-					     item_size);
+		ret = btrfs_add_system_chunk(fs_info, &key, chunk, item_size);
 	}
 
 out:
