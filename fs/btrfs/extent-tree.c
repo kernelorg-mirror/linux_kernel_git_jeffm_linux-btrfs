@@ -2744,9 +2744,8 @@ static u64 find_middle(struct rb_root *root)
 }
 #endif
 
-static inline u64 heads_to_leaves(struct btrfs_root *root, u64 heads)
+static inline u64 heads_to_leaves(struct btrfs_fs_info *fs_info, u64 heads)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 num_bytes;
 
 	num_bytes = heads * (sizeof(struct btrfs_extent_item) +
@@ -2780,8 +2779,7 @@ u64 btrfs_csum_bytes_to_leaves(struct btrfs_fs_info *fs_info, u64 csum_bytes)
 	return num_csums;
 }
 
-int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans,
-				       struct btrfs_root *root)
+int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans)
 {
 	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_rsv *global_rsv;
@@ -2792,7 +2790,7 @@ int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans,
 	int ret = 0;
 
 	num_bytes = btrfs_calc_trans_metadata_size(fs_info, 1);
-	num_heads = heads_to_leaves(root, num_heads);
+	num_heads = heads_to_leaves(fs_info, num_heads);
 	if (num_heads > 1)
 		num_bytes += (num_heads - 1) * fs_info->nodesize;
 	num_bytes <<= 1;
@@ -2817,8 +2815,7 @@ int btrfs_check_space_for_delayed_refs(struct btrfs_trans_handle *trans,
 	return ret;
 }
 
-int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans,
-				       struct btrfs_root *root)
+int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans)
 {
 	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 num_entries =
@@ -2834,7 +2831,7 @@ int btrfs_should_throttle_delayed_refs(struct btrfs_trans_handle *trans,
 	if (val >= NSEC_PER_SEC / 2)
 		return 2;
 
-	return btrfs_check_space_for_delayed_refs(trans, root);
+	return btrfs_check_space_for_delayed_refs(trans);
 }
 
 struct async_delayed_refs {
