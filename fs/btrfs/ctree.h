@@ -2933,7 +2933,7 @@ void btrfs_update_root_times(struct btrfs_trans_handle *trans,
 
 /* uuid-tree.c */
 int btrfs_uuid_tree_add(struct btrfs_trans_handle *trans,
-			struct btrfs_root *uuid_root, u8 *uuid, u8 type,
+			struct btrfs_fs_info *fs_info, u8 *uuid, u8 type,
 			u64 subid);
 int btrfs_uuid_tree_rem(struct btrfs_trans_handle *trans,
 			struct btrfs_root *uuid_root, u8 *uuid, u8 type,
