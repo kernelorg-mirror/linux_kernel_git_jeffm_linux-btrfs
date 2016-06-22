@@ -4236,7 +4236,7 @@ commit_trans:
 			    test_bit(BTRFS_TRANS_HAVE_FREE_BGS,
 				     &trans->transaction->flags) ||
 			    need_commit > 0) {
-				ret = btrfs_commit_transaction(trans, root);
+				ret = btrfs_commit_transaction(trans);
 				if (ret)
 					return ret;
 				/*
@@ -4828,7 +4828,7 @@ commit:
 	if (IS_ERR(trans))
 		return -ENOSPC;
 
-	return btrfs_commit_transaction(trans, root);
+	return btrfs_commit_transaction(trans);
 }
 
 struct reserve_ticket {
