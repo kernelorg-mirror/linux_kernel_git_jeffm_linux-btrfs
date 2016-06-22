@@ -3118,6 +3118,7 @@ int setup_extent_mapping(struct inode *inode, u64 start, u64 end,
 static int relocate_file_extent_cluster(struct inode *inode,
 					struct file_extent_cluster *cluster)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	u64 page_start;
 	u64 page_end;
 	u64 offset = BTRFS_I(inode)->index_cnt;
@@ -3213,7 +3214,7 @@ static int relocate_file_extent_cluster(struct inode *inode,
 
 		index++;
 		balance_dirty_pages_ratelimited(inode->i_mapping);
-		btrfs_throttle(BTRFS_I(inode)->root);
+		btrfs_throttle(fs_info);
 	}
 	WARN_ON(nr != cluster->nr);
 out:

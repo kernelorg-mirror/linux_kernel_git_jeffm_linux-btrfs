@@ -425,9 +425,8 @@ static inline int is_transaction_blocked(struct btrfs_transaction *trans)
  * when this is done, it is safe to start a new transaction, but the current
  * transaction might not be fully on disk.
  */
-static void wait_current_trans(struct btrfs_root *root)
+static void wait_current_trans(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_transaction *cur_trans;
 
 	spin_lock(&fs_info->trans_lock);
@@ -445,10 +444,8 @@ static void wait_current_trans(struct btrfs_root *root)
 	}
 }
 
-static int may_wait_transaction(struct btrfs_root *root, int type)
+static int may_wait_transaction(struct btrfs_fs_info *fs_info, int type)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	if (fs_info->log_root_recovering)
 		return 0;
 
@@ -548,13 +545,13 @@ again:
 	if (type & __TRANS_FREEZABLE)
 		sb_start_intwrite(fs_info->sb);
 
-	if (may_wait_transaction(root, type))
-		wait_current_trans(root);
+	if (may_wait_transaction(fs_info, type))
+		wait_current_trans(fs_info);
 
 	do {
 		ret = join_transaction(root, type);
 		if (ret == -EBUSY) {
-			wait_current_trans(root);
+			wait_current_trans(fs_info);
 			if (unlikely(type == TRANS_ATTACH))
 				ret = -ENOENT;
 		}
@@ -581,7 +578,7 @@ again:
 
 	smp_mb();
 	if (cur_trans->state >= TRANS_STATE_BLOCKED &&
-	    may_wait_transaction(root, type)) {
+	    may_wait_transaction(fs_info, type)) {
 		current->journal_info = h;
 		btrfs_commit_transaction(h, root);
 		goto again;
@@ -784,12 +781,10 @@ out:
 	return ret;
 }
 
-void btrfs_throttle(struct btrfs_root *root)
+void btrfs_throttle(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	if (!atomic_read(&fs_info->open_ioctl_trans))
-		wait_current_trans(root);
+		wait_current_trans(fs_info);
 }
 
 static int should_end_transaction(struct btrfs_trans_handle *trans)
