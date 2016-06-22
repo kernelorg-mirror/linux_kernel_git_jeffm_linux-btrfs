@@ -6134,10 +6134,11 @@ int btrfs_map_bio(struct btrfs_root *root, int rw, struct bio *bio,
 		/* In this case, map_length has been set to the length of
 		   a single stripe; not the whole write */
 		if (rw & WRITE) {
-			ret = raid56_parity_write(root, bio, bbio, map_length);
+			ret = raid56_parity_write(fs_info, bio, bbio,
+						  map_length);
 		} else {
-			ret = raid56_parity_recover(root, bio, bbio, map_length,
-						    mirror_num, 1);
+			ret = raid56_parity_recover(fs_info, bio, bbio,
+						    map_length, mirror_num, 1);
 		}
 
 		btrfs_bio_counter_dec(fs_info);
