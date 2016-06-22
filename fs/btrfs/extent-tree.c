@@ -6276,9 +6276,8 @@ static int update_block_group(struct btrfs_trans_handle *trans,
 	return 0;
 }
 
-static u64 first_logical_byte(struct btrfs_root *root, u64 search_start)
+static u64 first_logical_byte(struct btrfs_fs_info *fs_info, u64 search_start)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *cache;
 	u64 bytenr;
 
@@ -7487,7 +7486,7 @@ static noinline int find_free_extent(struct btrfs_root *orig_root,
 		spin_unlock(&last_ptr->lock);
 	}
 
-	search_start = max(search_start, first_logical_byte(root, 0));
+	search_start = max(search_start, first_logical_byte(fs_info, 0));
 	search_start = max(search_start, hint_byte);
 	if (search_start == hint_byte) {
 		block_group = btrfs_lookup_block_group(fs_info, search_start);
