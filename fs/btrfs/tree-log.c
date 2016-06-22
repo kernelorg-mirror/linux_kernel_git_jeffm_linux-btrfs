@@ -5695,7 +5695,7 @@ again:
 	return 0;
 error:
 	if (wc.trans)
-		btrfs_end_transaction(wc.trans, fs_info->tree_root);
+		btrfs_end_transaction(wc.trans);
 	btrfs_free_path(path);
 	return ret;
 }
