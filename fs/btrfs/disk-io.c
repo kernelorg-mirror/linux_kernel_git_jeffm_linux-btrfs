@@ -1826,7 +1826,7 @@ static int cleaner_kthread(void *arg)
 		}
 
 		mutex_lock(&fs_info->cleaner_delayed_iput_mutex);
-		btrfs_run_delayed_iputs(root);
+		btrfs_run_delayed_iputs(fs_info);
 		mutex_unlock(&fs_info->cleaner_delayed_iput_mutex);
 
 		again = btrfs_clean_one_deleted_snapshot(root);
@@ -3842,7 +3842,7 @@ int btrfs_commit_super(struct btrfs_fs_info *fs_info)
 	struct btrfs_trans_handle *trans;
 
 	mutex_lock(&fs_info->cleaner_mutex);
-	btrfs_run_delayed_iputs(root);
+	btrfs_run_delayed_iputs(fs_info);
 	mutex_unlock(&fs_info->cleaner_mutex);
 	wake_up_process(fs_info->cleaner_kthread);
 
@@ -4213,7 +4213,7 @@ static void btrfs_error_commit_super(struct btrfs_root *root)
 	struct btrfs_fs_info *fs_info = root->fs_info;
 
 	mutex_lock(&fs_info->cleaner_mutex);
-	btrfs_run_delayed_iputs(root);
+	btrfs_run_delayed_iputs(fs_info);
 	mutex_unlock(&fs_info->cleaner_mutex);
 
 	down_write(&fs_info->cleanup_work_sem);
