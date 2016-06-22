@@ -1364,7 +1364,7 @@ next_slot:
 				goto out_check;
 			if (extent_type == BTRFS_FILE_EXTENT_REG && !force)
 				goto out_check;
-			if (btrfs_extent_readonly(root, disk_bytenr))
+			if (btrfs_extent_readonly(fs_info, disk_bytenr))
 				goto out_check;
 			if (btrfs_cross_ref_exist(trans, root, ino,
 						  found_key.offset -
@@ -7300,6 +7300,7 @@ noinline int can_nocow_extent(struct inode *inode, u64 offset, u64 *len,
 			      u64 *orig_start, u64 *orig_block_len,
 			      u64 *ram_bytes)
 {
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	struct btrfs_trans_handle *trans;
 	struct btrfs_path *path;
 	int ret;
@@ -7380,7 +7381,7 @@ noinline int can_nocow_extent(struct inode *inode, u64 offset, u64 *len,
 		*ram_bytes = btrfs_file_extent_ram_bytes(leaf, fi);
 	}
 
-	if (btrfs_extent_readonly(root, disk_bytenr))
+	if (btrfs_extent_readonly(fs_info, disk_bytenr))
 		goto out;
 
 	num_bytes = min(offset + *len, extent_end) - offset;
