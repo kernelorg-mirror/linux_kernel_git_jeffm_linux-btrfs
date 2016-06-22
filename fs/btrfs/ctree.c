@@ -4681,7 +4681,7 @@ void btrfs_truncate_item(struct btrfs_root *root, struct btrfs_path *path,
 	btrfs_mark_buffer_dirty(leaf);
 
 	if (btrfs_leaf_free_space(fs_info, leaf) < 0) {
-		btrfs_print_leaf(root, leaf);
+		btrfs_print_leaf(fs_info, leaf);
 		BUG();
 	}
 }
@@ -4711,7 +4711,7 @@ void btrfs_extend_item(struct btrfs_root *root, struct btrfs_path *path,
 	data_end = leaf_data_end(fs_info, leaf);
 
 	if (btrfs_leaf_free_space(fs_info, leaf) < data_size) {
-		btrfs_print_leaf(root, leaf);
+		btrfs_print_leaf(fs_info, leaf);
 		BUG();
 	}
 	slot = path->slots[0];
@@ -4719,7 +4719,7 @@ void btrfs_extend_item(struct btrfs_root *root, struct btrfs_path *path,
 
 	BUG_ON(slot < 0);
 	if (slot >= nritems) {
-		btrfs_print_leaf(root, leaf);
+		btrfs_print_leaf(fs_info, leaf);
 		btrfs_crit(fs_info, "slot %d too large, nritems %d",
 			   slot, nritems);
 		BUG_ON(1);
@@ -4750,7 +4750,7 @@ void btrfs_extend_item(struct btrfs_root *root, struct btrfs_path *path,
 	btrfs_mark_buffer_dirty(leaf);
 
 	if (btrfs_leaf_free_space(fs_info, leaf) < 0) {
-		btrfs_print_leaf(root, leaf);
+		btrfs_print_leaf(fs_info, leaf);
 		BUG();
 	}
 }
@@ -4789,7 +4789,7 @@ void setup_items_for_insert(struct btrfs_root *root, struct btrfs_path *path,
 	data_end = leaf_data_end(fs_info, leaf);
 
 	if (btrfs_leaf_free_space(fs_info, leaf) < total_size) {
-		btrfs_print_leaf(root, leaf);
+		btrfs_print_leaf(fs_info, leaf);
 		btrfs_crit(fs_info, "not enough freespace need %u have %d",
 			   total_size, btrfs_leaf_free_space(fs_info, leaf));
 		BUG();
@@ -4799,7 +4799,7 @@ void setup_items_for_insert(struct btrfs_root *root, struct btrfs_path *path,
 		unsigned int old_data = btrfs_item_end_nr(leaf, slot);
 
 		if (old_data < data_end) {
-			btrfs_print_leaf(root, leaf);
+			btrfs_print_leaf(fs_info, leaf);
 			btrfs_crit(fs_info, "slot %d old_data %d data_end %d",
 				   slot, old_data, data_end);
 			BUG_ON(1);
@@ -4843,7 +4843,7 @@ void setup_items_for_insert(struct btrfs_root *root, struct btrfs_path *path,
 	btrfs_mark_buffer_dirty(leaf);
 
 	if (btrfs_leaf_free_space(fs_info, leaf) < 0) {
-		btrfs_print_leaf(root, leaf);
+		btrfs_print_leaf(fs_info, leaf);
 		BUG();
 	}
 }
