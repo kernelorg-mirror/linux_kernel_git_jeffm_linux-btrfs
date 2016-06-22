@@ -4577,10 +4577,9 @@ int btrfs_duplicate_item(struct btrfs_trans_handle *trans,
  * off the end of the item or if we shift the item to chop bytes off
  * the front.
  */
-void btrfs_truncate_item(struct btrfs_root *root, struct btrfs_path *path,
-			 u32 new_size, int from_end)
+void btrfs_truncate_item(struct btrfs_fs_info *fs_info,
+			 struct btrfs_path *path, u32 new_size, int from_end)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int slot;
 	struct extent_buffer *leaf;
 	struct btrfs_item *item;

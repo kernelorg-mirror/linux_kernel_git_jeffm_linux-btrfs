@@ -1880,7 +1880,7 @@ void update_inline_extent_backref(struct btrfs_root *root,
 			memmove_extent_buffer(leaf, ptr, ptr + size,
 					      end - ptr - size);
 		item_size -= size;
-		btrfs_truncate_item(root, path, item_size, 1);
+		btrfs_truncate_item(root->fs_info, path, item_size, 1);
 	}
 	btrfs_mark_buffer_dirty(leaf);
 }

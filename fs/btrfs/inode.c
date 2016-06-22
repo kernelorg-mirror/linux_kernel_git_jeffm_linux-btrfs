@@ -4312,7 +4312,7 @@ static int truncate_inline_extent(struct inode *inode,
 
 	btrfs_set_file_extent_ram_bytes(leaf, fi, size);
 	size = btrfs_file_extent_calc_inline_size(size);
-	btrfs_truncate_item(root, path, size, 1);
+	btrfs_truncate_item(root->fs_info, path, size, 1);
 
 	if (test_bit(BTRFS_ROOT_REF_COWS, &root->state))
 		inode_sub_bytes(inode, item_end + 1 - new_size);
