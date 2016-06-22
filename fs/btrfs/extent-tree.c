@@ -2876,10 +2876,9 @@ done:
 		kfree(async);
 }
 
-int btrfs_async_run_delayed_refs(struct btrfs_root *root,
+int btrfs_async_run_delayed_refs(struct btrfs_fs_info *fs_info,
 				 unsigned long count, int wait)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct async_delayed_refs *async;
 	int ret;
 
