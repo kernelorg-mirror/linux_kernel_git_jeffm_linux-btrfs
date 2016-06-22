@@ -7433,7 +7433,7 @@ refill_cluster:
 					      block_group->full_stripe_len);
 
 			/* allocate a cluster in this block group */
-			ret = btrfs_find_space_cluster(root, block_group,
+			ret = btrfs_find_space_cluster(fs_info, block_group,
 						       last_ptr, search_start,
 						       num_bytes,
 						       aligned_cluster);
