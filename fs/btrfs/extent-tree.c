@@ -8211,12 +8211,11 @@ static int alloc_reserved_tree_block(struct btrfs_trans_handle *trans,
 }
 
 int btrfs_alloc_reserved_file_extent(struct btrfs_trans_handle *trans,
-				     struct btrfs_root *root,
 				     u64 root_objectid, u64 owner,
 				     u64 offset, u64 ram_bytes,
 				     struct btrfs_key *ins)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
+	struct btrfs_fs_info *fs_info = trans->fs_info;
 	int ret;
 
 	BUG_ON(root_objectid == BTRFS_TREE_LOG_OBJECTID);
@@ -8248,7 +8247,8 @@ int btrfs_alloc_logged_file_extent(struct btrfs_trans_handle *trans,
 	 * need to do the exclude dance if this fs isn't mixed.
 	 */
 	if (!btrfs_fs_incompat(fs_info, MIXED_GROUPS)) {
-		ret = __exclude_logged_extent(root, ins->objectid, ins->offset);
+		ret = __exclude_logged_extent(fs_info, ins->objectid,
+					      ins->offset);
 		if (ret)
 			return ret;
 	}
