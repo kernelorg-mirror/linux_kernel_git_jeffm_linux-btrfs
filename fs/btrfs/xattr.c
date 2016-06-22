@@ -94,6 +94,7 @@ static int do_setxattr(struct btrfs_trans_handle *trans,
 {
 	struct btrfs_dir_item *di = NULL;
 	struct btrfs_root *root = BTRFS_I(inode)->root;
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_path *path;
 	size_t name_len = strlen(name);
 	int ret = 0;
@@ -185,7 +186,7 @@ static int do_setxattr(struct btrfs_trans_handle *trans,
 		char *ptr;
 
 		if (size > old_data_len) {
-			if (btrfs_leaf_free_space(root, leaf) <
+			if (btrfs_leaf_free_space(fs_info, leaf) <
 			    (size - old_data_len)) {
 				ret = -ENOSPC;
 				goto out;
