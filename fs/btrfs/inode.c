@@ -8300,8 +8300,7 @@ static struct bio *btrfs_dio_bio_alloc(struct block_device *bdev,
 	return bio;
 }
 
-static inline int btrfs_lookup_and_bind_dio_csum(struct btrfs_root *root,
-						 struct inode *inode,
+static inline int btrfs_lookup_and_bind_dio_csum(struct inode *inode,
 						 struct btrfs_dio_private *dip,
 						 struct bio *bio,
 						 u64 file_offset)
@@ -8371,7 +8370,7 @@ static inline int __btrfs_submit_dio_bio(struct bio *bio, struct inode *inode,
 		if (ret)
 			goto err;
 	} else {
-		ret = btrfs_lookup_and_bind_dio_csum(root, inode, dip, bio,
+		ret = btrfs_lookup_and_bind_dio_csum(inode, dip, bio,
 						     file_offset);
 		if (ret)
 			goto err;
