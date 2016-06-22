@@ -220,8 +220,9 @@ int btrfs_insert_root(struct btrfs_trans_handle *trans, struct btrfs_root *root,
 	return btrfs_insert_item(trans, root, key, item, sizeof(*item));
 }
 
-int btrfs_find_orphan_roots(struct btrfs_root *tree_root)
+int btrfs_find_orphan_roots(struct btrfs_fs_info *fs_info)
 {
+	struct btrfs_root *tree_root = fs_info->tree_root;
 	struct extent_buffer *leaf;
 	struct btrfs_path *path;
 	struct btrfs_key key;
