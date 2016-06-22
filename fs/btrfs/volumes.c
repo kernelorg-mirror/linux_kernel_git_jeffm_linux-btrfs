@@ -7097,10 +7097,9 @@ void btrfs_update_commit_device_size(struct btrfs_fs_info *fs_info)
 }
 
 /* Must be invoked during the transaction commit */
-void btrfs_update_commit_device_bytes_used(struct btrfs_root *root,
+void btrfs_update_commit_device_bytes_used(struct btrfs_fs_info *fs_info,
 					struct btrfs_transaction *transaction)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_map *em;
 	struct map_lookup *map;
 	struct btrfs_device *dev;
