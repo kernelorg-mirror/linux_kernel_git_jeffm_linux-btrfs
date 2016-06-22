@@ -75,8 +75,8 @@ static int btrfs_destroy_marked_extents(struct btrfs_fs_info *fs_info,
 					int mark);
 static int btrfs_destroy_pinned_extent(struct btrfs_fs_info *fs_info,
 				       struct extent_io_tree *pinned_extents);
-static int btrfs_cleanup_transaction(struct btrfs_root *root);
-static void btrfs_error_commit_super(struct btrfs_root *root);
+static int btrfs_cleanup_transaction(struct btrfs_fs_info *fs_info);
+static void btrfs_error_commit_super(struct btrfs_fs_info *fs_info);
 
 /*
  * btrfs_end_io_wq structs are used to do processing in task context when an IO
@@ -1936,7 +1936,7 @@ sleep:
 
 		if (unlikely(test_bit(BTRFS_FS_STATE_ERROR,
 				      &fs_info->fs_state)))
-			btrfs_cleanup_transaction(root);
+			btrfs_cleanup_transaction(fs_info);
 		set_current_state(TASK_INTERRUPTIBLE);
 		if (!kthread_should_stop() &&
 				(!btrfs_transaction_blocked(fs_info) ||
@@ -3184,7 +3184,7 @@ fail_qgroup:
 	btrfs_free_qgroup_config(fs_info);
 fail_trans_kthread:
 	kthread_stop(fs_info->transaction_kthread);
-	btrfs_cleanup_transaction(fs_info->tree_root);
+	btrfs_cleanup_transaction(fs_info);
 	btrfs_free_fs_roots(fs_info);
 fail_cleaner:
 	kthread_stop(fs_info->cleaner_kthread);
@@ -3897,7 +3897,7 @@ void close_ctree(struct btrfs_fs_info *fs_info)
 	}
 
 	if (test_bit(BTRFS_FS_STATE_ERROR, &fs_info->fs_state))
-		btrfs_error_commit_super(root);
+		btrfs_error_commit_super(fs_info);
 
 	kthread_stop(fs_info->transaction_kthread);
 	kthread_stop(fs_info->cleaner_kthread);
@@ -4204,10 +4204,8 @@ static int btrfs_check_super_valid(struct btrfs_fs_info *fs_info,
 	return ret;
 }
 
-static void btrfs_error_commit_super(struct btrfs_root *root)
+static void btrfs_error_commit_super(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	mutex_lock(&fs_info->cleaner_mutex);
 	btrfs_run_delayed_iputs(fs_info);
 	mutex_unlock(&fs_info->cleaner_mutex);
@@ -4216,7 +4214,7 @@ static void btrfs_error_commit_super(struct btrfs_root *root)
 	up_write(&fs_info->cleanup_work_sem);
 
 	/* cleanup FS via transaction */
-	btrfs_cleanup_transaction(root);
+	btrfs_cleanup_transaction(fs_info);
 }
 
 static void btrfs_destroy_ordered_extents(struct btrfs_root *root)
@@ -4473,9 +4471,8 @@ void btrfs_cleanup_one_transaction(struct btrfs_transaction *cur_trans,
 	*/
 }
 
-static int btrfs_cleanup_transaction(struct btrfs_root *root)
+static int btrfs_cleanup_transaction(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_transaction *t;
 
 	mutex_lock(&fs_info->transaction_kthread_mutex);
@@ -4513,7 +4510,7 @@ static int btrfs_cleanup_transaction(struct btrfs_root *root)
 		spin_unlock(&fs_info->trans_lock);
 
 		btrfs_put_transaction(t);
-		trace_btrfs_transaction_commit(root);
+		trace_btrfs_transaction_commit(fs_info->tree_root);
 		spin_lock(&fs_info->trans_lock);
 	}
 	spin_unlock(&fs_info->trans_lock);
