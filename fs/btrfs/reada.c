@@ -311,14 +311,13 @@ static struct reada_zone *reada_find_zone(struct btrfs_fs_info *fs_info,
 	return zone;
 }
 
-static struct reada_extent *reada_find_extent(struct btrfs_root *root,
+static struct reada_extent *reada_find_extent(struct btrfs_fs_info *fs_info,
 					      u64 logical,
 					      struct btrfs_key *top)
 {
 	int ret;
 	struct reada_extent *re = NULL;
 	struct reada_extent *re_exist = NULL;
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_bio *bbio = NULL;
 	struct btrfs_device *dev;
 	struct btrfs_device *prev_dev;
@@ -559,7 +558,7 @@ static int reada_add_block(struct reada_control *rc, u64 logical,
 	struct reada_extctl *rec;
 
 	/* takes one ref */
-	re = reada_find_extent(fs_info->tree_root, logical, top);
+	re = reada_find_extent(fs_info, logical, top);
 	if (!re)
 		return -1;
 
