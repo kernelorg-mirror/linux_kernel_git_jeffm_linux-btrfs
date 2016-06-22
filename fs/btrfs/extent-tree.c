@@ -2108,13 +2108,12 @@ int btrfs_inc_extent_ref(struct btrfs_trans_handle *trans,
 }
 
 static int __btrfs_inc_extent_ref(struct btrfs_trans_handle *trans,
-				  struct btrfs_root *root,
+				  struct btrfs_fs_info *fs_info,
 				  struct btrfs_delayed_ref_node *node,
 				  u64 parent, u64 root_objectid,
 				  u64 owner, u64 offset, int refs_to_add,
 				  struct btrfs_delayed_extent_op *extent_op)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_path *path;
 	struct extent_buffer *leaf;
 	struct btrfs_extent_item *item;
@@ -2200,7 +2199,7 @@ static int run_delayed_data_ref(struct btrfs_trans_handle *trans,
 						 ref->objectid, ref->offset,
 						 &ins, node->ref_mod);
 	} else if (node->action == BTRFS_ADD_DELAYED_REF) {
-		ret = __btrfs_inc_extent_ref(trans, root, node, parent,
+		ret = __btrfs_inc_extent_ref(trans, fs_info, node, parent,
 					     ref_root, ref->objectid,
 					     ref->offset, node->ref_mod,
 					     extent_op);
@@ -2364,7 +2363,7 @@ static int run_delayed_tree_ref(struct btrfs_trans_handle *trans,
 						&extent_op->key,
 						ref->level, &ins);
 	} else if (node->action == BTRFS_ADD_DELAYED_REF) {
-		ret = __btrfs_inc_extent_ref(trans, root, node,
+		ret = __btrfs_inc_extent_ref(trans, fs_info, node,
 					     parent, ref_root,
 					     ref->level, 0, 1,
 					     extent_op);
