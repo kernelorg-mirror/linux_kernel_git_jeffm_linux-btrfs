@@ -857,7 +857,7 @@ again:
 		diff /= csum_size;
 		diff *= csum_size;
 
-		btrfs_extend_item(root, path, diff);
+		btrfs_extend_item(fs_info, path, diff);
 		ret = 0;
 		goto csum;
 	}

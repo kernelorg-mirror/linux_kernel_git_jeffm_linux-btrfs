@@ -196,7 +196,7 @@ static int do_setxattr(struct btrfs_trans_handle *trans,
 		if (old_data_len + name_len + sizeof(*di) == item_size) {
 			/* No other xattrs packed in the same leaf item. */
 			if (size > old_data_len)
-				btrfs_extend_item(root, path,
+				btrfs_extend_item(fs_info, path,
 						  size - old_data_len);
 			else if (size < old_data_len)
 				btrfs_truncate_item(root, path, data_size, 1);
@@ -205,7 +205,7 @@ static int do_setxattr(struct btrfs_trans_handle *trans,
 			ret = btrfs_delete_one_dir_name(trans, root, path, di);
 			if (ret)
 				goto out;
-			btrfs_extend_item(root, path, data_size);
+			btrfs_extend_item(fs_info, path, data_size);
 		}
 
 		item = btrfs_item_nr(slot);
