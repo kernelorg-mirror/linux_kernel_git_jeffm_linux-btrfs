@@ -2630,7 +2630,7 @@ again:
 	inode_add_bytes(inode, len);
 	btrfs_release_path(path);
 
-	ret = btrfs_inc_extent_ref(trans, root, new->bytenr,
+	ret = btrfs_inc_extent_ref(trans, fs_info, new->bytenr,
 			new->disk_len, 0,
 			backref->root_id, backref->inum,
 			new->file_pos);	/* start - extent_offset */
@@ -4599,7 +4599,7 @@ delete:
 		     root == fs_info->tree_root)) {
 			btrfs_set_path_blocking(path);
 			bytes_deleted += extent_num_bytes;
-			ret = btrfs_free_extent(trans, root, extent_start,
+			ret = btrfs_free_extent(trans, fs_info, extent_start,
 						extent_num_bytes, 0,
 						btrfs_header_owner(leaf),
 						ino, extent_offset);
