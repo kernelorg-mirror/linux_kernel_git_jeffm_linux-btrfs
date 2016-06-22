@@ -2701,9 +2701,10 @@ out:
 	return ret;
 }
 
-static int btrfs_del_sys_chunk(struct btrfs_root *root, u64 chunk_objectid, u64
-			chunk_offset)
+static int btrfs_del_sys_chunk(struct btrfs_fs_info *fs_info,
+			       u64 chunk_objectid, u64 chunk_offset)
 {
+	struct btrfs_root *root = fs_info->chunk_root;
 	struct btrfs_super_block *super_copy = root->fs_info->super_copy;
 	struct btrfs_disk_key *disk_key;
 	struct btrfs_chunk *chunk;
@@ -2835,7 +2836,8 @@ int btrfs_remove_chunk(struct btrfs_trans_handle *trans,
 	trace_btrfs_chunk_free(root, map, chunk_offset, em->len);
 
 	if (map->type & BTRFS_BLOCK_GROUP_SYSTEM) {
-		ret = btrfs_del_sys_chunk(root, chunk_objectid, chunk_offset);
+		ret = btrfs_del_sys_chunk(fs_info, chunk_objectid,
+					  chunk_offset);
 		if (ret) {
 			btrfs_abort_transaction(trans, ret);
 			goto out;
