@@ -9405,7 +9405,7 @@ again:
 		mutex_unlock(&fs_info->ro_block_group_mutex);
 		btrfs_end_transaction(trans, root);
 
-		ret = btrfs_wait_for_commit(root, transid);
+		ret = btrfs_wait_for_commit(fs_info, transid);
 		if (ret)
 			return ret;
 		goto again;
