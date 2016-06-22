@@ -162,8 +162,7 @@ static void btrfs_io_bio_endio_readpage(struct btrfs_io_bio *bio, int err)
 	kfree(bio->csum_allocated);
 }
 
-static int __btrfs_lookup_bio_sums(struct btrfs_root *root,
-				   struct inode *inode, struct bio *bio,
+static int __btrfs_lookup_bio_sums(struct inode *inode, struct bio *bio,
 				   u64 logical_offset, u32 *dst, int dio)
 {
 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
@@ -316,16 +315,14 @@ done:
 	return 0;
 }
 
-int btrfs_lookup_bio_sums(struct btrfs_root *root, struct inode *inode,
-			  struct bio *bio, u32 *dst)
+int btrfs_lookup_bio_sums(struct inode *inode, struct bio *bio, u32 *dst)
 {
-	return __btrfs_lookup_bio_sums(root, inode, bio, 0, dst, 0);
+	return __btrfs_lookup_bio_sums(inode, bio, 0, dst, 0);
 }
 
-int btrfs_lookup_bio_sums_dio(struct btrfs_root *root, struct inode *inode,
-			      struct bio *bio, u64 offset)
+int btrfs_lookup_bio_sums_dio(struct inode *inode, struct bio *bio, u64 offset)
 {
-	return __btrfs_lookup_bio_sums(root, inode, bio, offset, NULL, 1);
+	return __btrfs_lookup_bio_sums(inode, bio, offset, NULL, 1);
 }
 
 int btrfs_lookup_csums_range(struct btrfs_root *root, u64 start, u64 end,

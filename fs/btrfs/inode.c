@@ -1937,7 +1937,7 @@ static int btrfs_submit_bio_hook(struct inode *inode, int rw, struct bio *bio,
 							   bio_flags);
 			goto out;
 		} else if (!skip_sum) {
-			ret = btrfs_lookup_bio_sums(root, inode, bio, NULL);
+			ret = btrfs_lookup_bio_sums(inode, bio, NULL);
 			if (ret)
 				goto out;
 		}
@@ -8286,7 +8286,7 @@ static inline int btrfs_lookup_and_bind_dio_csum(struct btrfs_root *root,
 	 * contention.
 	 */
 	if (dip->logical_offset == file_offset) {
-		ret = btrfs_lookup_bio_sums_dio(root, inode, dip->orig_bio,
+		ret = btrfs_lookup_bio_sums_dio(inode, dip->orig_bio,
 						file_offset);
 		if (ret)
 			return ret;
