@@ -489,10 +489,9 @@ static void btrfs_drop_pages(struct page **pages, size_t num_pages)
  * this also makes the decision about creating an inline extent vs
  * doing real data extents, marking pages dirty and delalloc as required.
  */
-int btrfs_dirty_pages(struct btrfs_root *root, struct inode *inode,
-			     struct page **pages, size_t num_pages,
-			     loff_t pos, size_t write_bytes,
-			     struct extent_state **cached)
+int btrfs_dirty_pages(struct inode *inode, struct page **pages,
+		      size_t num_pages, loff_t pos, size_t write_bytes,
+		      struct extent_state **cached)
 {
 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	int err = 0;
@@ -1669,9 +1668,8 @@ again:
 					fs_info->sectorsize);
 
 		if (copied > 0)
-			ret = btrfs_dirty_pages(root, inode, pages,
-						dirty_pages, pos, copied,
-						NULL);
+			ret = btrfs_dirty_pages(inode, pages, dirty_pages,
+						pos, copied, NULL);
 		if (need_unlock)
 			unlock_extent_cached(&BTRFS_I(inode)->io_tree,
 					     lockstart, lockend, &cached_state,
