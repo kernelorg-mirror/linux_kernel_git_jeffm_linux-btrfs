@@ -1340,10 +1340,9 @@ static inline u32 BTRFS_MAX_XATTR_SIZE(const struct btrfs_fs_info *info)
 
 #ifdef CONFIG_BTRFS_DEBUG
 static inline int
-btrfs_should_fragment_free_space(struct btrfs_root *root,
-				 struct btrfs_block_group_cache *block_group)
+btrfs_should_fragment_free_space(struct btrfs_block_group_cache *block_group)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
+	struct btrfs_fs_info *fs_info = block_group->fs_info;
 
 	return (btrfs_test_opt(fs_info, FRAGMENT_METADATA) &&
 		block_group->flags & BTRFS_BLOCK_GROUP_METADATA) ||
