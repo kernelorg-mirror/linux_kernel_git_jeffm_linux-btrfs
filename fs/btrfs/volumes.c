@@ -2760,7 +2760,6 @@ int btrfs_remove_chunk(struct btrfs_trans_handle *trans,
 {
 	struct extent_map_tree *em_tree;
 	struct extent_map *em;
-	struct btrfs_root *extent_root = fs_info->extent_root;
 	struct map_lookup *map;
 	u64 dev_extent_len = 0;
 	u64 chunk_objectid = BTRFS_FIRST_CHUNK_TREE_OBJECTID;
@@ -2788,7 +2787,7 @@ int btrfs_remove_chunk(struct btrfs_trans_handle *trans,
 	}
 	map = em->map_lookup;
 	lock_chunks(fs_info);
-	check_system_chunk(trans, extent_root, map->type);
+	check_system_chunk(trans, fs_info, map->type);
 	unlock_chunks(fs_info);
 
 	/*
@@ -4528,10 +4527,10 @@ static void check_raid56_incompat_flag(struct btrfs_fs_info *info, u64 type)
 				/ sizeof(struct btrfs_stripe) + 1)
 
 static int __btrfs_alloc_chunk(struct btrfs_trans_handle *trans,
-			       struct btrfs_root *extent_root, u64 start,
+			       struct btrfs_fs_info *fs_info, u64 start,
 			       u64 type)
 {
-	struct btrfs_fs_info *info = extent_root->fs_info;
+	struct btrfs_fs_info *info = trans->fs_info;
 	struct btrfs_fs_devices *fs_devices = info->fs_devices;
 	struct list_head *cur;
 	struct map_lookup *map = NULL;
@@ -4948,14 +4947,13 @@ out:
  * bootstrap process of adding storage to a seed btrfs.
  */
 int btrfs_alloc_chunk(struct btrfs_trans_handle *trans,
-		      struct btrfs_root *extent_root, u64 type)
+		      struct btrfs_fs_info *fs_info, u64 type)
 {
-	struct btrfs_fs_info *fs_info = extent_root->fs_info;
 	u64 chunk_offset;
 
 	ASSERT(mutex_is_locked(&fs_info->chunk_mutex));
 	chunk_offset = find_next_chunk(fs_info);
-	return __btrfs_alloc_chunk(trans, extent_root, chunk_offset, type);
+	return __btrfs_alloc_chunk(trans, fs_info, chunk_offset, type);
 }
 
 static noinline int init_first_rw_device(struct btrfs_trans_handle *trans,
@@ -4971,14 +4969,13 @@ static noinline int init_first_rw_device(struct btrfs_trans_handle *trans,
 
 	chunk_offset = find_next_chunk(fs_info);
 	alloc_profile = btrfs_get_alloc_profile(extent_root, 0);
-	ret = __btrfs_alloc_chunk(trans, extent_root, chunk_offset,
-				  alloc_profile);
+	ret = __btrfs_alloc_chunk(trans, fs_info, chunk_offset, alloc_profile);
 	if (ret)
 		return ret;
 
 	sys_chunk_offset = find_next_chunk(fs_info);
 	alloc_profile = btrfs_get_alloc_profile(fs_info->chunk_root, 0);
-	ret = __btrfs_alloc_chunk(trans, extent_root, sys_chunk_offset,
+	ret = __btrfs_alloc_chunk(trans,fs_info,  sys_chunk_offset,
 				  alloc_profile);
 	return ret;
 }

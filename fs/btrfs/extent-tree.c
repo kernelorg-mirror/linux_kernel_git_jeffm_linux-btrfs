@@ -4373,9 +4373,8 @@ static int should_alloc_chunk(struct btrfs_root *root,
 	return 1;
 }
 
-static u64 get_profile_num_devs(struct btrfs_root *root, u64 type)
+static u64 get_profile_num_devs(struct btrfs_fs_info *fs_info, u64 type)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 num_dev;
 
 	if (type & (BTRFS_BLOCK_GROUP_RAID10 |
@@ -4397,10 +4396,8 @@ static u64 get_profile_num_devs(struct btrfs_root *root, u64 type)
  * removing a chunk.
  */
 void check_system_chunk(struct btrfs_trans_handle *trans,
-			struct btrfs_root *root,
-			u64 type)
+			struct btrfs_fs_info *fs_info, u64 type)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_space_info *info;
 	u64 left;
 	u64 thresh;
@@ -4420,7 +4417,7 @@ void check_system_chunk(struct btrfs_trans_handle *trans,
 		info->bytes_may_use;
 	spin_unlock(&info->lock);
 
-	num_devs = get_profile_num_devs(root, type);
+	num_devs = get_profile_num_devs(fs_info, type);
 
 	/* num_devs device items to update and 1 chunk item to add or remove */
 	thresh = btrfs_calc_trunc_metadata_size(fs_info, num_devs) +
@@ -4442,7 +4439,7 @@ void check_system_chunk(struct btrfs_trans_handle *trans,
 		 * the paths we visit in the chunk tree (they were already COWed
 		 * or created in the current transaction for example).
 		 */
-		ret = btrfs_alloc_chunk(trans, root, flags);
+		ret = btrfs_alloc_chunk(trans, fs_info, flags);
 	}
 
 	if (!ret) {
@@ -4536,9 +4533,9 @@ again:
 	 * Check if we have enough space in SYSTEM chunk because we may need
 	 * to update devices.
 	 */
-	check_system_chunk(trans, extent_root, flags);
+	check_system_chunk(trans, fs_info, flags);
 
-	ret = btrfs_alloc_chunk(trans, extent_root, flags);
+	ret = btrfs_alloc_chunk(trans, fs_info, flags);
 	trans->allocating_chunk = false;
 
 	spin_lock(&space_info->lock);
@@ -9447,7 +9444,7 @@ out:
 	if (cache->flags & BTRFS_BLOCK_GROUP_SYSTEM) {
 		alloc_flags = update_block_group_flags(fs_info, cache->flags);
 		lock_chunks(fs_info);
-		check_system_chunk(trans, root, alloc_flags);
+		check_system_chunk(trans, fs_info, alloc_flags);
 		unlock_chunks(fs_info);
 	}
 	mutex_unlock(&fs_info->ro_block_group_mutex);

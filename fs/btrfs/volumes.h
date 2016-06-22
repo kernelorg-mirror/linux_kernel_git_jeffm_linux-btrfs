@@ -387,7 +387,7 @@ int btrfs_rmap_block(struct btrfs_mapping_tree *map_tree,
 int btrfs_read_sys_array(struct btrfs_fs_info *fs_info);
 int btrfs_read_chunk_tree(struct btrfs_fs_info *fs_info);
 int btrfs_alloc_chunk(struct btrfs_trans_handle *trans,
-		      struct btrfs_root *extent_root, u64 type);
+		      struct btrfs_fs_info *fs_info, u64 type);
 void btrfs_mapping_init(struct btrfs_mapping_tree *tree);
 void btrfs_mapping_tree_free(struct btrfs_mapping_tree *tree);
 int btrfs_map_bio(struct btrfs_root *root, int rw, struct bio *bio,
