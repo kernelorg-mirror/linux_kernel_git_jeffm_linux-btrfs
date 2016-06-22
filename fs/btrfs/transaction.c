@@ -183,10 +183,10 @@ static inline int extwriter_counter_read(struct btrfs_transaction *trans)
 /*
  * either allocate a new transaction or hop into the existing one
  */
-static noinline int join_transaction(struct btrfs_root *root, unsigned int type)
+static noinline int join_transaction(struct btrfs_fs_info *fs_info,
+				     unsigned int type)
 {
 	struct btrfs_transaction *cur_trans;
-	struct btrfs_fs_info *fs_info = root->fs_info;
 
 	spin_lock(&fs_info->trans_lock);
 loop:
@@ -549,7 +549,7 @@ again:
 		wait_current_trans(fs_info);
 
 	do {
-		ret = join_transaction(root, type);
+		ret = join_transaction(fs_info, type);
 		if (ret == -EBUSY) {
 			wait_current_trans(fs_info);
 			if (unlikely(type == TRANS_ATTACH))
