@@ -509,7 +509,7 @@ static inline void btrfs_dev_stat_reset(struct btrfs_device *dev,
 }
 
 void btrfs_update_commit_device_size(struct btrfs_fs_info *fs_info);
-void btrfs_update_commit_device_bytes_used(struct btrfs_root *root,
+void btrfs_update_commit_device_bytes_used(struct btrfs_fs_info *fs_info,
 					struct btrfs_transaction *transaction);
 
 static inline void lock_chunks(struct btrfs_fs_info *fs_info)
