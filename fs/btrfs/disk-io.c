@@ -3635,9 +3635,8 @@ int btrfs_calc_num_tolerated_disk_barrier_failures(
 	return num_tolerated_disk_barrier_failures;
 }
 
-static int write_all_supers(struct btrfs_root *root, int max_mirrors)
+static int write_all_supers(struct btrfs_fs_info *fs_info, int max_mirrors)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct list_head *head;
 	struct btrfs_device *dev;
 	struct btrfs_super_block *sb;
@@ -3731,9 +3730,9 @@ static int write_all_supers(struct btrfs_root *root, int max_mirrors)
 }
 
 int write_ctree_super(struct btrfs_trans_handle *trans,
-		      struct btrfs_root *root, int max_mirrors)
+		      struct btrfs_fs_info *fs_info, int max_mirrors)
 {
-	return write_all_supers(root, max_mirrors);
+	return write_all_supers(fs_info, max_mirrors);
 }
 
 /* Drop a fs root from the radix tree and free it. */
