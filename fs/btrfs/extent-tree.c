@@ -79,7 +79,7 @@ static int update_block_group(struct btrfs_trans_handle *trans,
 			      struct btrfs_fs_info *fs_info, u64 bytenr,
 			      u64 num_bytes, int alloc);
 static int __btrfs_free_extent(struct btrfs_trans_handle *trans,
-				struct btrfs_root *root,
+			       struct btrfs_fs_info *fs_info,
 				struct btrfs_delayed_ref_node *node, u64 parent,
 				u64 root_objectid, u64 owner_objectid,
 				u64 owner_offset, int refs_to_drop,
@@ -2216,7 +2216,7 @@ static int run_delayed_data_ref(struct btrfs_trans_handle *trans,
 					     ref->offset, node->ref_mod,
 					     extent_op);
 	} else if (node->action == BTRFS_DROP_DELAYED_REF) {
-		ret = __btrfs_free_extent(trans, root, node, parent,
+		ret = __btrfs_free_extent(trans, fs_info, node, parent,
 					  ref_root, ref->objectid,
 					  ref->offset, node->ref_mod,
 					  extent_op);
@@ -2381,7 +2381,7 @@ static int run_delayed_tree_ref(struct btrfs_trans_handle *trans,
 					     ref->level, 0, 1,
 					     extent_op);
 	} else if (node->action == BTRFS_DROP_DELAYED_REF) {
-		ret = __btrfs_free_extent(trans, root, node,
+		ret = __btrfs_free_extent(trans, fs_info, node,
 					  parent, ref_root,
 					  ref->level, 0, 1, extent_op);
 	} else {
@@ -6626,7 +6626,7 @@ static void add_pinned_bytes(struct btrfs_fs_info *fs_info, u64 num_bytes,
 
 
 static int __btrfs_free_extent(struct btrfs_trans_handle *trans,
-				struct btrfs_root *root,
+				struct btrfs_fs_info *info,
 				struct btrfs_delayed_ref_node *node, u64 parent,
 				u64 root_objectid, u64 owner_objectid,
 				u64 owner_offset, int refs_to_drop,
@@ -6634,7 +6634,6 @@ static int __btrfs_free_extent(struct btrfs_trans_handle *trans,
 {
 	struct btrfs_key key;
 	struct btrfs_path *path;
-	struct btrfs_fs_info *info = root->fs_info;
 	struct btrfs_root *extent_root = info->extent_root;
 	struct extent_buffer *leaf;
 	struct btrfs_extent_item *ei;
