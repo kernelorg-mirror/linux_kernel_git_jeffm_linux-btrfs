@@ -1761,24 +1761,23 @@ int btrfs_transaction_blocked(struct btrfs_fs_info *info)
  * wait for the current transaction commit to start and block subsequent
  * transaction joins
  */
-static void wait_current_trans_commit_start(struct btrfs_root *root,
+static void wait_current_trans_commit_start(struct btrfs_fs_info *fs_info,
 					    struct btrfs_transaction *trans)
 {
-	wait_event(root->fs_info->transaction_blocked_wait,
-		   trans->state >= TRANS_STATE_COMMIT_START ||
-		   trans->aborted);
+	wait_event(fs_info->transaction_blocked_wait,
+		   trans->state >= TRANS_STATE_COMMIT_START || trans->aborted);
 }
 
 /*
  * wait for the current transaction to start and then become unblocked.
  * caller holds ref.
  */
-static void wait_current_trans_commit_start_and_unblock(struct btrfs_root *root,
-					 struct btrfs_transaction *trans)
+static void wait_current_trans_commit_start_and_unblock(
+					struct btrfs_fs_info *fs_info,
+					struct btrfs_transaction *trans)
 {
-	wait_event(root->fs_info->transaction_wait,
-		   trans->state >= TRANS_STATE_UNBLOCKED ||
-		   trans->aborted);
+	wait_event(fs_info->transaction_wait,
+		   trans->state >= TRANS_STATE_UNBLOCKED || trans->aborted);
 }
 
 /*
@@ -1847,9 +1846,9 @@ int btrfs_commit_transaction_async(struct btrfs_trans_handle *trans,
 
 	/* wait for transaction to start and unblock */
 	if (wait_for_unblock)
-		wait_current_trans_commit_start_and_unblock(root, cur_trans);
+		wait_current_trans_commit_start_and_unblock(fs_info, cur_trans);
 	else
-		wait_current_trans_commit_start(root, cur_trans);
+		wait_current_trans_commit_start(fs_info, cur_trans);
 
 	if (current->journal_info == trans)
 		current->journal_info = NULL;
