@@ -1894,10 +1894,10 @@ static int __btrfs_submit_bio_done(struct inode *inode, int rw, struct bio *bio,
 			  int mirror_num, unsigned long bio_flags,
 			  u64 bio_offset)
 {
-	struct btrfs_root *root = BTRFS_I(inode)->root;
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	int ret;
 
-	ret = btrfs_map_bio(root, rw, bio, mirror_num, 1);
+	ret = btrfs_map_bio(fs_info, rw, bio, mirror_num, 1);
 	if (ret) {
 		bio->bi_error = ret;
 		bio_endio(bio);
@@ -1958,7 +1958,7 @@ static int btrfs_submit_bio_hook(struct inode *inode, int rw, struct bio *bio,
 	}
 
 mapit:
-	ret = btrfs_map_bio(root, rw, bio, mirror_num, 0);
+	ret = btrfs_map_bio(fs_info, rw, bio, mirror_num, 0);
 
 out:
 	if (ret < 0) {
@@ -7822,19 +7822,18 @@ err:
 static inline int submit_dio_repair_bio(struct inode *inode, struct bio *bio,
 					int rw, int mirror_num)
 {
-	struct btrfs_root *root = BTRFS_I(inode)->root;
+	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	int ret;
 
 	BUG_ON(rw & REQ_WRITE);
 
 	bio_get(bio);
 
-	ret = btrfs_bio_wq_end_io(root->fs_info, bio,
-				  BTRFS_WQ_ENDIO_DIO_REPAIR);
+	ret = btrfs_bio_wq_end_io(fs_info, bio, BTRFS_WQ_ENDIO_DIO_REPAIR);
 	if (ret)
 		goto err;
 
-	ret = btrfs_map_bio(root, rw, bio, mirror_num, 0);
+	ret = btrfs_map_bio(fs_info, rw, bio, mirror_num, 0);
 err:
 	bio_put(bio);
 	return ret;
@@ -8305,7 +8304,6 @@ static inline int __btrfs_submit_dio_bio(struct bio *bio, struct inode *inode,
 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	struct btrfs_dio_private *dip = bio->bi_private;
 	int write = rw & REQ_WRITE;
-	struct btrfs_root *root = BTRFS_I(inode)->root;
 	int ret;
 
 	if (async_submit)
@@ -8343,7 +8341,7 @@ static inline int __btrfs_submit_dio_bio(struct bio *bio, struct inode *inode,
 			goto err;
 	}
 map:
-	ret = btrfs_map_bio(root, rw, bio, 0, async_submit);
+	ret = btrfs_map_bio(fs_info, rw, bio, 0, async_submit);
 err:
 	bio_put(bio);
 	return ret;

@@ -5996,8 +5996,7 @@ static void btrfs_end_bio(struct bio *bio)
  * This will add one bio to the pending list for a device and make sure
  * the work struct is scheduled.
  */
-static noinline void btrfs_schedule_bio(struct btrfs_root *root,
-					struct btrfs_device *device,
+static noinline void btrfs_schedule_bio(struct btrfs_device *device,
 					int rw, struct bio *bio)
 {
 	struct btrfs_fs_info *fs_info = device->fs_info;
@@ -6049,11 +6048,11 @@ static noinline void btrfs_schedule_bio(struct btrfs_root *root,
 		btrfs_queue_work(fs_info->submit_workers, &device->work);
 }
 
-static void submit_stripe_bio(struct btrfs_root *root, struct btrfs_bio *bbio,
-			      struct bio *bio, u64 physical, int dev_nr,
-			      int rw, int async)
+static void submit_stripe_bio(struct btrfs_bio *bbio, struct bio *bio,
+			      u64 physical, int dev_nr, int rw, int async)
 {
 	struct btrfs_device *dev = bbio->stripes[dev_nr].dev;
+	struct btrfs_fs_info *fs_info = bbio->fs_info;
 
 	bio->bi_private = bbio;
 	btrfs_io_bio(bio)->stripe_index = dev_nr;
@@ -6074,10 +6073,10 @@ static void submit_stripe_bio(struct btrfs_root *root, struct btrfs_bio *bbio,
 #endif
 	bio->bi_bdev = dev->bdev;
 
-	btrfs_bio_counter_inc_noblocked(root->fs_info);
+	btrfs_bio_counter_inc_noblocked(fs_info);
 
 	if (async)
-		btrfs_schedule_bio(root, dev, rw, bio);
+		btrfs_schedule_bio(dev, rw, bio);
 	else
 		btrfsic_submit_bio(rw, bio);
 }
@@ -6096,10 +6095,9 @@ static void bbio_error(struct btrfs_bio *bbio, struct bio *bio, u64 logical)
 	}
 }
 
-int btrfs_map_bio(struct btrfs_root *root, int rw, struct bio *bio,
+int btrfs_map_bio(struct btrfs_fs_info *fs_info, int rw, struct bio *bio,
 		  int mirror_num, int async_submit)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_device *dev;
 	struct bio *first_bio = bio;
 	u64 logical = (u64)bio->bi_iter.bi_sector << 9;
@@ -6164,9 +6162,8 @@ int btrfs_map_bio(struct btrfs_root *root, int rw, struct bio *bio,
 		} else
 			bio = first_bio;
 
-		submit_stripe_bio(root, bbio, bio,
-				  bbio->stripes[dev_nr].physical, dev_nr, rw,
-				  async_submit);
+		submit_stripe_bio(bbio, bio, bbio->stripes[dev_nr].physical,
+				  dev_nr, rw, async_submit);
 	}
 	btrfs_bio_counter_dec(fs_info);
 	return 0;

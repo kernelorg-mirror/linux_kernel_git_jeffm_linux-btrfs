@@ -331,7 +331,6 @@ int btrfs_submit_compressed_write(struct inode *inode, u64 start,
 {
 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	struct bio *bio = NULL;
-	struct btrfs_root *root = BTRFS_I(inode)->root;
 	struct compressed_bio *cb;
 	unsigned long bytes_left;
 	struct extent_io_tree *io_tree = &BTRFS_I(inode)->io_tree;
@@ -401,7 +400,7 @@ int btrfs_submit_compressed_write(struct inode *inode, u64 start,
 				BUG_ON(ret); /* -ENOMEM */
 			}
 
-			ret = btrfs_map_bio(root, WRITE, bio, 0, 1);
+			ret = btrfs_map_bio(fs_info, WRITE, bio, 0, 1);
 			BUG_ON(ret); /* -ENOMEM */
 
 			bio_put(bio);
@@ -431,7 +430,7 @@ int btrfs_submit_compressed_write(struct inode *inode, u64 start,
 		BUG_ON(ret); /* -ENOMEM */
 	}
 
-	ret = btrfs_map_bio(root, WRITE, bio, 0, 1);
+	ret = btrfs_map_bio(fs_info, WRITE, bio, 0, 1);
 	BUG_ON(ret); /* -ENOMEM */
 
 	bio_put(bio);
@@ -567,7 +566,6 @@ int btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
 	struct extent_io_tree *tree;
 	struct extent_map_tree *em_tree;
 	struct compressed_bio *cb;
-	struct btrfs_root *root = BTRFS_I(inode)->root;
 	unsigned long uncompressed_len = bio->bi_vcnt * PAGE_SIZE;
 	unsigned long compressed_len;
 	unsigned long nr_pages;
@@ -688,7 +686,7 @@ int btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
 			sums += DIV_ROUND_UP(comp_bio->bi_iter.bi_size,
 					     fs_info->sectorsize);
 
-			ret = btrfs_map_bio(root, READ, comp_bio,
+			ret = btrfs_map_bio(fs_info, READ, comp_bio,
 					    mirror_num, 0);
 			if (ret) {
 				bio->bi_error = ret;
@@ -717,7 +715,7 @@ int btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
 		BUG_ON(ret); /* -ENOMEM */
 	}
 
-	ret = btrfs_map_bio(root, READ, comp_bio, mirror_num, 0);
+	ret = btrfs_map_bio(fs_info, READ, comp_bio, mirror_num, 0);
 	if (ret) {
 		bio->bi_error = ret;
 		bio_endio(comp_bio);
