@@ -1201,10 +1201,9 @@ static int cow_file_range_async(struct inode *inode, struct page *locked_page,
 	return 0;
 }
 
-static noinline int csum_exist_in_range(struct btrfs_root *root,
+static noinline int csum_exist_in_range(struct btrfs_fs_info *fs_info,
 					u64 bytenr, u64 num_bytes)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	struct btrfs_ordered_sum *sums;
 	LIST_HEAD(list);
@@ -1387,7 +1386,8 @@ next_slot:
 			 * this ensure that csum for a given extent are
 			 * either valid or do not exist.
 			 */
-			if (csum_exist_in_range(root, disk_bytenr, num_bytes))
+			if (csum_exist_in_range(fs_info, disk_bytenr,
+						num_bytes))
 				goto out_check;
 			if (!btrfs_inc_nocow_writers(fs_info, disk_bytenr))
 				goto out_check;
@@ -7432,8 +7432,8 @@ noinline int can_nocow_extent(struct inode *inode, u64 offset, u64 *len,
 	 */
 	disk_bytenr += backref_offset;
 	disk_bytenr += offset - key.offset;
-	if (csum_exist_in_range(root, disk_bytenr, num_bytes))
-				goto out;
+	if (csum_exist_in_range(fs_info, disk_bytenr, num_bytes))
+		goto out;
 	/*
 	 * all of the above have passed, it is safe to overwrite this extent
 	 * without cow
