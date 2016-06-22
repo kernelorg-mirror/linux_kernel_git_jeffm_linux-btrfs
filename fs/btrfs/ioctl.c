@@ -4137,9 +4137,9 @@ void btrfs_get_block_group_info(struct list_head *groups_list,
 	}
 }
 
-static long btrfs_ioctl_space_info(struct btrfs_root *root, void __user *arg)
+static long btrfs_ioctl_space_info(struct btrfs_fs_info *fs_info,
+				   void __user *arg)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_ioctl_space_args space_args;
 	struct btrfs_ioctl_space_info space;
 	struct btrfs_ioctl_space_info *dest;
@@ -5589,7 +5589,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_LOGICAL_INO:
 		return btrfs_ioctl_logical_to_ino(fs_info, argp);
 	case BTRFS_IOC_SPACE_INFO:
-		return btrfs_ioctl_space_info(root, argp);
+		return btrfs_ioctl_space_info(fs_info, argp);
 	case BTRFS_IOC_SYNC: {
 		int ret;
 
