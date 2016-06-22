@@ -2037,10 +2037,9 @@ static int btrfs_issue_discard(struct block_device *bdev, u64 start, u64 len,
 	return ret;
 }
 
-int btrfs_discard_extent(struct btrfs_root *root, u64 bytenr,
+int btrfs_discard_extent(struct btrfs_fs_info *fs_info, u64 bytenr,
 			 u64 num_bytes, u64 *actual_bytes)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	u64 discarded_bytes = 0;
 	struct btrfs_bio *bbio = NULL;
@@ -6758,7 +6757,7 @@ int btrfs_finish_extent_commit(struct btrfs_trans_handle *trans,
 		}
 
 		if (btrfs_test_opt(fs_info, DISCARD))
-			ret = btrfs_discard_extent(root, start,
+			ret = btrfs_discard_extent(fs_info, start,
 						   end + 1 - start, NULL);
 
 		clear_extent_dirty(unpin, start, end);
@@ -6778,7 +6777,7 @@ int btrfs_finish_extent_commit(struct btrfs_trans_handle *trans,
 
 		ret = -EROFS;
 		if (!trans->aborted)
-			ret = btrfs_discard_extent(root,
+			ret = btrfs_discard_extent(fs_info,
 						   block_group->key.objectid,
 						   block_group->key.offset,
 						   &trimmed);
@@ -8007,7 +8006,7 @@ static int __btrfs_free_reserved_extent(struct btrfs_root *root,
 		pin_down_extent(root, cache, start, len, 1);
 	else {
 		if (btrfs_test_opt(fs_info, DISCARD))
-			ret = btrfs_discard_extent(root, start, len, NULL);
+			ret = btrfs_discard_extent(fs_info, start, len, NULL);
 		btrfs_add_free_space(cache, start, len);
 		btrfs_update_reserved_bytes(cache, len, RESERVE_FREE, delalloc);
 		trace_btrfs_reserved_extent_free(fs_info->extent_root,
