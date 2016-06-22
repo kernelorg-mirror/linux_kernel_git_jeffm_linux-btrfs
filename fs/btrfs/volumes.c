@@ -4785,7 +4785,7 @@ static int __btrfs_alloc_chunk(struct btrfs_trans_handle *trans,
 		goto error;
 	}
 
-	ret = btrfs_make_block_group(trans, extent_root, 0, type,
+	ret = btrfs_make_block_group(trans, info, 0, type,
 				     BTRFS_FIRST_CHUNK_TREE_OBJECTID,
 				     start, num_bytes);
 	if (ret)
