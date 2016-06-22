@@ -7016,10 +7016,9 @@ static void btrfs_dev_stat_print_on_load(struct btrfs_device *dev)
 	       btrfs_dev_stat_read(dev, BTRFS_DEV_STAT_GENERATION_ERRS));
 }
 
-int btrfs_get_dev_stats(struct btrfs_root *root,
+int btrfs_get_dev_stats(struct btrfs_fs_info *fs_info,
 			struct btrfs_ioctl_get_dev_stats *stats)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_device *dev;
 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
 	int i;
