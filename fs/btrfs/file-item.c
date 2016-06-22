@@ -445,8 +445,8 @@ fail:
 	return ret;
 }
 
-int btrfs_csum_one_bio(struct btrfs_root *root, struct inode *inode,
-		       struct bio *bio, u64 file_start, int contig)
+int btrfs_csum_one_bio(struct inode *inode, struct bio *bio,
+		       u64 file_start, int contig)
 {
 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
 	struct btrfs_ordered_sum *sums;

@@ -1878,10 +1878,9 @@ static int __btrfs_submit_bio_start(struct inode *inode, int rw,
 				    unsigned long bio_flags,
 				    u64 bio_offset)
 {
-	struct btrfs_root *root = BTRFS_I(inode)->root;
 	int ret = 0;
 
-	ret = btrfs_csum_one_bio(root, inode, bio, 0, 0);
+	ret = btrfs_csum_one_bio(inode, bio, 0, 0);
 	BUG_ON(ret); /* -ENOMEM */
 	return 0;
 }
@@ -1956,7 +1955,7 @@ static int btrfs_submit_bio_hook(struct inode *inode, int rw, struct bio *bio,
 				   __btrfs_submit_bio_done);
 		goto out;
 	} else if (!skip_sum) {
-		ret = btrfs_csum_one_bio(root, inode, bio, 0, 0);
+		ret = btrfs_csum_one_bio(inode, bio, 0, 0);
 		if (ret)
 			goto out;
 	}
@@ -8247,8 +8246,7 @@ static int __btrfs_submit_bio_start_direct_io(struct inode *inode, int rw,
 				    unsigned long bio_flags, u64 offset)
 {
 	int ret;
-	struct btrfs_root *root = BTRFS_I(inode)->root;
-	ret = btrfs_csum_one_bio(root, inode, bio, offset, 1);
+	ret = btrfs_csum_one_bio(inode, bio, offset, 1);
 	BUG_ON(ret); /* -ENOMEM */
 	return 0;
 }
@@ -8369,7 +8367,7 @@ static inline int __btrfs_submit_dio_bio(struct bio *bio, struct inode *inode,
 		 * If we aren't doing async submit, calculate the csum of the
 		 * bio now.
 		 */
-		ret = btrfs_csum_one_bio(root, inode, bio, file_offset, 1);
+		ret = btrfs_csum_one_bio(inode, bio, file_offset, 1);
 		if (ret)
 			goto err;
 	} else {
