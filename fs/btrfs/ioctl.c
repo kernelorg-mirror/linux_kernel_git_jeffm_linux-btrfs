@@ -4410,7 +4410,7 @@ static long btrfs_ioctl_scrub_progress(struct btrfs_root *root,
 	return ret;
 }
 
-static long btrfs_ioctl_get_dev_stats(struct btrfs_root *root,
+static long btrfs_ioctl_get_dev_stats(struct btrfs_fs_info *fs_info,
 				      void __user *arg)
 {
 	struct btrfs_ioctl_get_dev_stats *sa;
@@ -4425,7 +4425,7 @@ static long btrfs_ioctl_get_dev_stats(struct btrfs_root *root,
 		return -EPERM;
 	}
 
-	ret = btrfs_get_dev_stats(root, sa);
+	ret = btrfs_get_dev_stats(fs_info, sa);
 
 	if (copy_to_user(arg, sa, sizeof(*sa)))
 		ret = -EFAULT;
@@ -5635,7 +5635,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_SEND:
 		return btrfs_ioctl_send(file, argp);
 	case BTRFS_IOC_GET_DEV_STATS:
-		return btrfs_ioctl_get_dev_stats(root, argp);
+		return btrfs_ioctl_get_dev_stats(fs_info, argp);
 	case BTRFS_IOC_QUOTA_CTL:
 		return btrfs_ioctl_quota_ctl(file, argp);
 	case BTRFS_IOC_QGROUP_ASSIGN:
