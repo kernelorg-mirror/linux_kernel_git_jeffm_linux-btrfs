@@ -1821,8 +1821,8 @@ int btrfs_rm_device(struct btrfs_root *root, char *device_path, u64 devid)
 	if (ret)
 		goto out;
 
-	ret = btrfs_find_device_by_devspec(root, devid, device_path,
-				&device);
+	ret = btrfs_find_device_by_devspec(fs_info, devid, device_path,
+					   &device);
 	if (ret)
 		goto out;
 
@@ -2046,10 +2046,10 @@ void btrfs_destroy_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
 	call_rcu(&tgtdev->rcu, free_device);
 }
 
-static int btrfs_find_device_by_path(struct btrfs_root *root, char *device_path,
+static int btrfs_find_device_by_path(struct btrfs_fs_info *fs_info,
+				     char *device_path,
 				     struct btrfs_device **device)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret = 0;
 	struct btrfs_super_block *disk_super;
 	u64 devid;
@@ -2073,12 +2073,10 @@ static int btrfs_find_device_by_path(struct btrfs_root *root, char *device_path,
 	return ret;
 }
 
-int btrfs_find_device_missing_or_by_path(struct btrfs_root *root,
+int btrfs_find_device_missing_or_by_path(struct btrfs_fs_info *fs_info,
 					 char *device_path,
 					 struct btrfs_device **device)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	*device = NULL;
 	if (strcmp(device_path, "missing") == 0) {
 		struct list_head *devices;
@@ -2101,18 +2099,16 @@ int btrfs_find_device_missing_or_by_path(struct btrfs_root *root,
 
 		return 0;
 	} else {
-		return btrfs_find_device_by_path(root, device_path, device);
+		return btrfs_find_device_by_path(fs_info, device_path, device);
 	}
 }
 
 /*
  * Lookup a device given by device id, or the path if the id is 0.
  */
-int btrfs_find_device_by_devspec(struct btrfs_root *root, u64 devid,
-					 char *devpath,
-					 struct btrfs_device **device)
+int btrfs_find_device_by_devspec(struct btrfs_fs_info *fs_info, u64 devid,
+				 char *devpath, struct btrfs_device **device)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 
 	if (devid) {
@@ -2124,7 +2120,7 @@ int btrfs_find_device_by_devspec(struct btrfs_root *root, u64 devid,
 		if (!devpath || !devpath[0])
 			return -EINVAL;
 
-		ret = btrfs_find_device_missing_or_by_path(root, devpath,
+		ret = btrfs_find_device_missing_or_by_path(fs_info, devpath,
 							   device);
 	}
 	return ret;

@@ -314,7 +314,7 @@ int btrfs_dev_replace_start(struct btrfs_root *root, char *tgtdev_name,
 
 	/* the disk copy procedure reuses the scrub code */
 	mutex_lock(&fs_info->volume_mutex);
-	ret = btrfs_find_device_by_devspec(root, srcdevid,
+	ret = btrfs_find_device_by_devspec(fs_info, srcdevid,
 					    srcdev_name, &src_device);
 	if (ret) {
 		mutex_unlock(&fs_info->volume_mutex);
