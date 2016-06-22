@@ -4356,10 +4356,9 @@ static inline u64 calc_global_rsv_need_space(struct btrfs_block_rsv *global)
 	return (global->size << 1);
 }
 
-static int should_alloc_chunk(struct btrfs_root *root,
+static int should_alloc_chunk(struct btrfs_fs_info *fs_info,
 			      struct btrfs_space_info *sinfo, int force)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_rsv *global_rsv = &fs_info->global_block_rsv;
 	u64 num_bytes = sinfo->total_bytes - sinfo->bytes_readonly;
 	u64 num_allocated = sinfo->bytes_used + sinfo->bytes_reserved;
@@ -4495,7 +4494,7 @@ again:
 	if (force < space_info->force_alloc)
 		force = space_info->force_alloc;
 	if (space_info->full) {
-		if (should_alloc_chunk(extent_root, space_info, force))
+		if (should_alloc_chunk(fs_info, space_info, force))
 			ret = -ENOSPC;
 		else
 			ret = 0;
@@ -4503,7 +4502,7 @@ again:
 		return ret;
 	}
 
-	if (!should_alloc_chunk(extent_root, space_info, force)) {
+	if (!should_alloc_chunk(fs_info, space_info, force)) {
 		spin_unlock(&space_info->lock);
 		return 0;
 	} else if (space_info->chunk_alloc) {
