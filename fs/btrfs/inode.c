@@ -4606,7 +4606,7 @@ delete:
 						ino, extent_offset);
 			BUG_ON(ret);
 			if (btrfs_should_throttle_delayed_refs(trans, fs_info))
-				btrfs_async_run_delayed_refs(root,
+				btrfs_async_run_delayed_refs(fs_info,
 							     trans->transid,
 					trans->delayed_ref_updates * 2, 0);
 			if (be_nice) {
