@@ -2471,14 +2471,14 @@ error:
 	return ret;
 }
 
-int btrfs_init_dev_replace_tgtdev(struct btrfs_root *root, char *device_path,
+int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
+				  char *device_path,
 				  struct btrfs_device *srcdev,
 				  struct btrfs_device **device_out)
 {
 	struct request_queue *q;
 	struct btrfs_device *device;
 	struct block_device *bdev;
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct list_head *devices;
 	struct rcu_string *name;
 	u64 devid = BTRFS_DEV_REPLACE_DEVID;
