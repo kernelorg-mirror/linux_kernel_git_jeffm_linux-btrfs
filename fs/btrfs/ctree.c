@@ -5333,8 +5333,7 @@ static int tree_advance(struct btrfs_fs_info *fs_info,
 	return ret;
 }
 
-static int tree_compare_item(struct btrfs_root *left_root,
-			     struct btrfs_path *left_path,
+static int tree_compare_item(struct btrfs_path *left_path,
 			     struct btrfs_path *right_path,
 			     char *tmp_buf)
 {
@@ -5562,8 +5561,8 @@ int btrfs_compare_trees(struct btrfs_root *left_root,
 				enum btrfs_compare_tree_result result;
 
 				WARN_ON(!extent_buffer_uptodate(left_path->nodes[0]));
-				ret = tree_compare_item(left_root, left_path,
-						right_path, tmp_buf);
+				ret = tree_compare_item(left_path, right_path,
+							tmp_buf);
 				if (ret)
 					result = BTRFS_COMPARE_TREE_CHANGED;
 				else
