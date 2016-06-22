@@ -393,7 +393,7 @@ struct btrfs_dir_item *btrfs_match_dir_item_name(struct btrfs_root *root,
 
 	leaf = path->nodes[0];
 	dir_item = btrfs_item_ptr(leaf, path->slots[0], struct btrfs_dir_item);
-	if (verify_dir_item(root, leaf, dir_item))
+	if (verify_dir_item(root->fs_info, leaf, dir_item))
 		return NULL;
 
 	total_len = btrfs_item_size_nr(leaf, path->slots[0]);
@@ -449,11 +449,10 @@ int btrfs_delete_one_dir_name(struct btrfs_trans_handle *trans,
 	return ret;
 }
 
-int verify_dir_item(struct btrfs_root *root,
+int verify_dir_item(struct btrfs_fs_info *fs_info,
 		    struct extent_buffer *leaf,
 		    struct btrfs_dir_item *dir_item)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u16 namelen = BTRFS_NAME_LEN;
 	u8 type = btrfs_dir_type(leaf, dir_item);
 
