@@ -6184,8 +6184,7 @@ struct btrfs_device *btrfs_find_device(struct btrfs_fs_info *fs_info, u64 devid,
 	return NULL;
 }
 
-static struct btrfs_device *add_missing_dev(struct btrfs_root *root,
-					    struct btrfs_fs_devices *fs_devices,
+static struct btrfs_device *add_missing_dev(struct btrfs_fs_devices *fs_devices,
 					    u64 devid, u8 *dev_uuid)
 {
 	struct btrfs_device *device;
@@ -6399,8 +6398,8 @@ static int read_one_chunk(struct btrfs_root *root, struct btrfs_key *key,
 		}
 		if (!map->stripes[i].dev) {
 			map->stripes[i].dev =
-				add_missing_dev(root, fs_info->fs_devices,
-						devid, uuid);
+				add_missing_dev(fs_info->fs_devices, devid,
+						uuid);
 			if (!map->stripes[i].dev) {
 				free_extent_map(em);
 				return -EIO;
@@ -6528,7 +6527,7 @@ static int read_one_dev(struct btrfs_root *root,
 		if (!btrfs_test_opt(fs_info, DEGRADED))
 			return -EIO;
 
-		device = add_missing_dev(root, fs_devices, devid, dev_uuid);
+		device = add_missing_dev(fs_devices, devid, dev_uuid);
 		if (!device)
 			return -ENOMEM;
 		btrfs_warn(fs_info, "devid %llu uuid %pU missing",
