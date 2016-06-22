@@ -1034,20 +1034,17 @@ fail:
 }
 
 static noinline_for_stack int
-write_pinned_extent_entries(struct btrfs_root *root,
+write_pinned_extent_entries(struct btrfs_fs_info *fs_info,
 			    struct btrfs_block_group_cache *block_group,
 			    struct btrfs_io_ctl *io_ctl,
 			    int *entries)
 {
-	struct btrfs_fs_info *fs_info;
 	u64 start, extent_start, extent_end, len;
 	struct extent_io_tree *unpin = NULL;
 	int ret;
 
 	if (!block_group)
 		return 0;
-
-	fs_info = block_group->fs_info;
 
 	/*
 	 * We want to add any pinned extents to our free space cache
@@ -1227,6 +1224,7 @@ static int __btrfs_write_out_cache(struct btrfs_root *root, struct inode *inode,
 				   struct btrfs_trans_handle *trans,
 				   struct btrfs_path *path, u64 offset)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_state *cached_state = NULL;
 	LIST_HEAD(bitmap_list);
 	int entries = 0;
@@ -1284,7 +1282,8 @@ static int __btrfs_write_out_cache(struct btrfs_root *root, struct inode *inode,
 	 * If this changes while we are working we'll get added back to
 	 * the dirty list and redo it.  No locking needed
 	 */
-	ret = write_pinned_extent_entries(root, block_group, io_ctl, &entries);
+	ret = write_pinned_extent_entries(fs_info, block_group,
+					  io_ctl, &entries);
 	if (ret)
 		goto out_nospc_locked;
 
