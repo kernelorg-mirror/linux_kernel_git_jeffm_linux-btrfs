@@ -2828,10 +2828,9 @@ out_kfree:
 	return NULL;
 }
 
-static void btrfs_release_delalloc_bytes(struct btrfs_root *root,
+static void btrfs_release_delalloc_bytes(struct btrfs_fs_info *fs_info,
 					 u64 start, u64 len)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *cache;
 
 	cache = btrfs_lookup_block_group(fs_info, start);
@@ -2957,7 +2956,7 @@ static int btrfs_finish_ordered_io(struct btrfs_ordered_extent *ordered_extent)
 						compress_type, 0, 0,
 						BTRFS_FILE_EXTENT_REG);
 		if (!ret)
-			btrfs_release_delalloc_bytes(root,
+			btrfs_release_delalloc_bytes(fs_info,
 						     ordered_extent->start,
 						     ordered_extent->disk_len);
 	}
