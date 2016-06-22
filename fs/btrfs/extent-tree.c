@@ -10893,9 +10893,8 @@ static int btrfs_trim_free_extents(struct btrfs_device *device,
 	return ret;
 }
 
-int btrfs_trim_fs(struct btrfs_root *root, struct fstrim_range *range)
+int btrfs_trim_fs(struct btrfs_fs_info *fs_info, struct fstrim_range *range)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *cache = NULL;
 	struct btrfs_device *device;
 	struct list_head *devices;
