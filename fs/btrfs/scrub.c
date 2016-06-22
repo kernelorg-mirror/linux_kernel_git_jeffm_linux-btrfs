@@ -3974,10 +3974,8 @@ int btrfs_scrub_dev(struct btrfs_fs_info *fs_info, u64 devid, u64 start,
 	return ret;
 }
 
-void btrfs_scrub_pause(struct btrfs_root *root)
+void btrfs_scrub_pause(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	mutex_lock(&fs_info->scrub_lock);
 	atomic_inc(&fs_info->scrub_pause_req);
 	while (atomic_read(&fs_info->scrubs_paused) !=
@@ -3991,10 +3989,8 @@ void btrfs_scrub_pause(struct btrfs_root *root)
 	mutex_unlock(&fs_info->scrub_lock);
 }
 
-void btrfs_scrub_continue(struct btrfs_root *root)
+void btrfs_scrub_continue(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	atomic_dec(&fs_info->scrub_pause_req);
 	wake_up(&fs_info->scrub_pause_wait);
 }

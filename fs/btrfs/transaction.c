@@ -2063,7 +2063,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 
 	btrfs_wait_pending_ordered(cur_trans);
 
-	btrfs_scrub_pause(root);
+	btrfs_scrub_pause(fs_info);
 	/*
 	 * Ok now we need to make sure to block out any other joins while we
 	 * commit the transaction.  We could have started a join before setting
@@ -2284,7 +2284,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 
 	trace_btrfs_transaction_commit(root);
 
-	btrfs_scrub_continue(root);
+	btrfs_scrub_continue(fs_info);
 
 	if (current->journal_info == trans)
 		current->journal_info = NULL;
@@ -2298,7 +2298,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 	return ret;
 
 scrub_continue:
-	btrfs_scrub_continue(root);
+	btrfs_scrub_continue(fs_info);
 cleanup_transaction:
 	btrfs_trans_release_metadata(trans, fs_info);
 	btrfs_trans_release_chunk_metadata(trans);
