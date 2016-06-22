@@ -2389,12 +2389,11 @@ static int run_delayed_tree_ref(struct btrfs_trans_handle *trans,
 
 /* helper function to actually process a single delayed ref entry */
 static int run_one_delayed_ref(struct btrfs_trans_handle *trans,
-			       struct btrfs_root *root,
+			       struct btrfs_fs_info *fs_info,
 			       struct btrfs_delayed_ref_node *node,
 			       struct btrfs_delayed_extent_op *extent_op,
 			       int insert_reserved)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret = 0;
 
 	if (trans->aborted) {
@@ -2645,7 +2644,7 @@ static noinline int __btrfs_run_delayed_refs(struct btrfs_trans_handle *trans,
 		}
 		spin_unlock(&locked_ref->lock);
 
-		ret = run_one_delayed_ref(trans, root, ref, extent_op,
+		ret = run_one_delayed_ref(trans, fs_info, ref, extent_op,
 					  must_insert_reserved);
 
 		btrfs_free_delayed_extent_op(extent_op);
