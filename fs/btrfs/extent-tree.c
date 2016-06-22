@@ -6857,7 +6857,7 @@ out:
  * removes it from the tree.
  */
 static noinline int check_ref_cleanup(struct btrfs_trans_handle *trans,
-				      struct btrfs_root *root, u64 bytenr)
+				      u64 bytenr)
 {
 	struct btrfs_delayed_ref_head *head;
 	struct btrfs_delayed_ref_root *delayed_refs;
@@ -6948,7 +6948,7 @@ void btrfs_free_tree_block(struct btrfs_trans_handle *trans,
 		struct btrfs_block_group_cache *cache;
 
 		if (root->root_key.objectid != BTRFS_TREE_LOG_OBJECTID) {
-			ret = check_ref_cleanup(trans, root, buf->start);
+			ret = check_ref_cleanup(trans, buf->start);
 			if (!ret)
 				goto out;
 		}
