@@ -715,8 +715,7 @@ static int reada_start_machine_dev(struct btrfs_fs_info *fs_info,
 	logical = re->logical;
 
 	atomic_inc(&dev->reada_in_flight);
-	ret = reada_tree_block_flagged(fs_info->extent_root, logical,
-			mirror_num, &eb);
+	ret = reada_tree_block_flagged(fs_info, logical, mirror_num, &eb);
 	if (ret)
 		__readahead_hook(fs_info, re, NULL, logical, ret);
 	else if (eb)
