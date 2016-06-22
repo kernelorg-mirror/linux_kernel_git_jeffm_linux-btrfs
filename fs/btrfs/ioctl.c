@@ -488,7 +488,7 @@ static noinline int create_subvol(struct inode *dir,
 	trans = btrfs_start_transaction(root, 0);
 	if (IS_ERR(trans)) {
 		ret = PTR_ERR(trans);
-		btrfs_subvolume_release_metadata(root, &block_rsv,
+		btrfs_subvolume_release_metadata(fs_info, &block_rsv,
 						 qgroup_reserved);
 		goto fail_free;
 	}
@@ -617,7 +617,7 @@ fail:
 	kfree(root_item);
 	trans->block_rsv = NULL;
 	trans->bytes_reserved = 0;
-	btrfs_subvolume_release_metadata(root, &block_rsv, qgroup_reserved);
+	btrfs_subvolume_release_metadata(fs_info, &block_rsv, qgroup_reserved);
 
 	if (async_transid) {
 		*async_transid = trans->transid;
@@ -759,7 +759,7 @@ static int create_snapshot(struct btrfs_root *root, struct inode *dir,
 	d_instantiate(dentry, inode);
 	ret = 0;
 fail:
-	btrfs_subvolume_release_metadata(BTRFS_I(dir)->root,
+	btrfs_subvolume_release_metadata(fs_info,
 					 &pending_snapshot->block_rsv,
 					 pending_snapshot->qgroup_reserved);
 dec_and_free:
@@ -2548,7 +2548,7 @@ out_end_trans:
 		err = ret;
 	inode->i_flags |= S_DEAD;
 out_release:
-	btrfs_subvolume_release_metadata(root, &block_rsv, qgroup_reserved);
+	btrfs_subvolume_release_metadata(fs_info, &block_rsv, qgroup_reserved);
 out_up_write:
 	up_write(&fs_info->subvol_sem);
 	if (err) {

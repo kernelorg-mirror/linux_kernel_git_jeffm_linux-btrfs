@@ -5826,11 +5826,11 @@ int btrfs_subvolume_reserve_metadata(struct btrfs_root *root,
 	return ret;
 }
 
-void btrfs_subvolume_release_metadata(struct btrfs_root *root,
+void btrfs_subvolume_release_metadata(struct btrfs_fs_info *fs_info,
 				      struct btrfs_block_rsv *rsv,
 				      u64 qgroup_reserved)
 {
-	btrfs_block_rsv_release(root->fs_info, rsv, (u64)-1);
+	btrfs_block_rsv_release(fs_info, rsv, (u64)-1);
 }
 
 /**
