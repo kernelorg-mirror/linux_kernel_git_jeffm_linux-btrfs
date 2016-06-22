@@ -3042,7 +3042,7 @@ retry_root_backup:
 
 #ifdef CONFIG_BTRFS_FS_CHECK_INTEGRITY
 	if (btrfs_test_opt(fs_info, CHECK_INTEGRITY)) {
-		ret = btrfsic_mount(tree_root, fs_devices,
+		ret = btrfsic_mount(fs_info, fs_devices,
 				    btrfs_test_opt(fs_info,
 					CHECK_INTEGRITY_INCLUDING_EXTENT_DATA) ?
 				    1 : 0,
@@ -3939,7 +3939,7 @@ void close_ctree(struct btrfs_fs_info *fs_info)
 
 #ifdef CONFIG_BTRFS_FS_CHECK_INTEGRITY
 	if (btrfs_test_opt(fs_info, CHECK_INTEGRITY))
-		btrfsic_unmount(root, fs_info->fs_devices);
+		btrfsic_unmount(fs_info->fs_devices);
 #endif
 
 	btrfs_close_devices(fs_info->fs_devices);
