@@ -88,7 +88,7 @@ static void __run_delayed_extent_op(struct btrfs_delayed_extent_op *extent_op,
 				    struct extent_buffer *leaf,
 				    struct btrfs_extent_item *ei);
 static int alloc_reserved_file_extent(struct btrfs_trans_handle *trans,
-				      struct btrfs_root *root,
+				      struct btrfs_fs_info *fs_info,
 				      u64 parent, u64 root_objectid,
 				      u64 flags, u64 owner, u64 offset,
 				      struct btrfs_key *ins, int ref_mod);
@@ -2197,7 +2197,7 @@ static int run_delayed_data_ref(struct btrfs_trans_handle *trans,
 	if (node->action == BTRFS_ADD_DELAYED_REF && insert_reserved) {
 		if (extent_op)
 			flags |= extent_op->flags_to_set;
-		ret = alloc_reserved_file_extent(trans, root,
+		ret = alloc_reserved_file_extent(trans, fs_info,
 						 parent, ref_root, flags,
 						 ref->objectid, ref->offset,
 						 &ins, node->ref_mod);
@@ -7813,13 +7813,12 @@ int btrfs_free_and_pin_reserved_extent(struct btrfs_root *root,
 }
 
 static int alloc_reserved_file_extent(struct btrfs_trans_handle *trans,
-				      struct btrfs_root *root,
+				      struct btrfs_fs_info *fs_info,
 				      u64 parent, u64 root_objectid,
 				      u64 flags, u64 owner, u64 offset,
 				      struct btrfs_key *ins, int ref_mod)
 {
 	int ret;
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_extent_item *extent_item;
 	struct btrfs_extent_inline_ref *iref;
 	struct btrfs_path *path;
@@ -8000,11 +7999,10 @@ int btrfs_alloc_reserved_file_extent(struct btrfs_trans_handle *trans,
  * space cache bits as well
  */
 int btrfs_alloc_logged_file_extent(struct btrfs_trans_handle *trans,
-				   struct btrfs_root *root,
+				   struct btrfs_fs_info *fs_info,
 				   u64 root_objectid, u64 owner, u64 offset,
 				   struct btrfs_key *ins)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	struct btrfs_block_group_cache *block_group;
 
@@ -8026,7 +8024,7 @@ int btrfs_alloc_logged_file_extent(struct btrfs_trans_handle *trans,
 	ret = btrfs_update_reserved_bytes(block_group, ins->offset,
 					  RESERVE_ALLOC_NO_ACCOUNT, 0);
 	BUG_ON(ret); /* logic error */
-	ret = alloc_reserved_file_extent(trans, root, 0, root_objectid,
+	ret = alloc_reserved_file_extent(trans, fs_info, 0, root_objectid,
 					 0, owner, offset, ins, 1);
 	btrfs_put_block_group(block_group);
 	return ret;

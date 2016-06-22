@@ -708,7 +708,8 @@ static noinline int replay_one_extent(struct btrfs_trans_handle *trans,
 				 * allocation tree
 				 */
 				ret = btrfs_alloc_logged_file_extent(trans,
-						root, root->root_key.objectid,
+						fs_info,
+						root->root_key.objectid,
 						key->objectid, offset, &ins);
 				if (ret)
 					goto out;
