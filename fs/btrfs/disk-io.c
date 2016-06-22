@@ -1091,9 +1091,8 @@ static const struct address_space_operations btree_aops = {
 	.set_page_dirty = btree_set_page_dirty,
 };
 
-void readahead_tree_block(struct btrfs_root *root, u64 bytenr)
+void readahead_tree_block(struct btrfs_fs_info *fs_info, u64 bytenr)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *buf = NULL;
 	struct inode *btree_inode = fs_info->btree_inode;
 
