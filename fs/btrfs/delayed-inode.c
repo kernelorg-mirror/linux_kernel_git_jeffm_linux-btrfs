@@ -676,10 +676,9 @@ static int btrfs_delayed_inode_reserve_metadata(
 	return ret;
 }
 
-static void btrfs_delayed_inode_release_metadata(struct btrfs_root *root,
+static void btrfs_delayed_inode_release_metadata(struct btrfs_fs_info *fs_info,
 						struct btrfs_delayed_node *node)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_rsv *rsv;
 
 	if (!node->bytes_reserved)
@@ -1019,6 +1018,7 @@ static int __btrfs_update_delayed_inode(struct btrfs_trans_handle *trans,
 					struct btrfs_path *path,
 					struct btrfs_delayed_node *node)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_key key;
 	struct btrfs_inode_item *inode_item;
 	struct extent_buffer *leaf;
@@ -1075,7 +1075,7 @@ out:
 no_iref:
 	btrfs_release_path(path);
 err_out:
-	btrfs_delayed_inode_release_metadata(root, node);
+	btrfs_delayed_inode_release_metadata(fs_info, node);
 	btrfs_release_delayed_inode(node);
 
 	return ret;
@@ -1939,7 +1939,7 @@ static void __btrfs_kill_delayed_node(struct btrfs_delayed_node *delayed_node)
 		btrfs_release_delayed_iref(delayed_node);
 
 	if (test_bit(BTRFS_DELAYED_NODE_INODE_DIRTY, &delayed_node->flags)) {
-		btrfs_delayed_inode_release_metadata(root, delayed_node);
+		btrfs_delayed_inode_release_metadata(fs_info, delayed_node);
 		btrfs_release_delayed_inode(delayed_node);
 	}
 	mutex_unlock(&delayed_node->mutex);
