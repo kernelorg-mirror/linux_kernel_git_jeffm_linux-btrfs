@@ -4387,7 +4387,7 @@ static long btrfs_ioctl_scrub_cancel(struct btrfs_root *root, void __user *arg)
 	return btrfs_scrub_cancel(root->fs_info);
 }
 
-static long btrfs_ioctl_scrub_progress(struct btrfs_root *root,
+static long btrfs_ioctl_scrub_progress(struct btrfs_fs_info *fs_info,
 				       void __user *arg)
 {
 	struct btrfs_ioctl_scrub_args *sa;
@@ -4400,7 +4400,7 @@ static long btrfs_ioctl_scrub_progress(struct btrfs_root *root,
 	if (IS_ERR(sa))
 		return PTR_ERR(sa);
 
-	ret = btrfs_scrub_progress(root, sa->devid, &sa->progress);
+	ret = btrfs_scrub_progress(fs_info, sa->devid, &sa->progress);
 
 	if (copy_to_user(arg, sa, sizeof(*sa)))
 		ret = -EFAULT;
@@ -5618,7 +5618,7 @@ long btrfs_ioctl(struct file *file, unsigned int
 	case BTRFS_IOC_SCRUB_CANCEL:
 		return btrfs_ioctl_scrub_cancel(root, argp);
 	case BTRFS_IOC_SCRUB_PROGRESS:
-		return btrfs_ioctl_scrub_progress(root, argp);
+		return btrfs_ioctl_scrub_progress(fs_info, argp);
 	case BTRFS_IOC_BALANCE_V2:
 		return btrfs_ioctl_balance(file, argp);
 	case BTRFS_IOC_BALANCE_CTL:
