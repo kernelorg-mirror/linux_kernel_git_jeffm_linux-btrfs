@@ -2849,7 +2849,7 @@ static void delayed_ref_async_start(struct btrfs_work *work)
 	if (ret)
 		async->error = ret;
 
-	ret = btrfs_end_transaction(trans, async->root);
+	ret = btrfs_end_transaction(trans);
 	if (ret && !async->error)
 		async->error = ret;
 done:
@@ -4159,7 +4159,7 @@ alloc:
 
 			ret = do_chunk_alloc(trans, fs_info, alloc_target,
 					     CHUNK_ALLOC_NO_FORCE);
-			btrfs_end_transaction(trans, root);
+			btrfs_end_transaction(trans);
 			if (ret < 0) {
 				if (ret != -ENOSPC)
 					return ret;
@@ -4216,7 +4216,7 @@ commit_trans:
 				mutex_unlock(&fs_info->cleaner_delayed_iput_mutex);
 				goto again;
 			} else {
-				btrfs_end_transaction(trans, root);
+				btrfs_end_transaction(trans);
 			}
 		}
 
@@ -4820,7 +4820,7 @@ static int flush_space(struct btrfs_root *root,
 			break;
 		}
 		ret = btrfs_run_delayed_items_nr(trans, fs_info, nr);
-		btrfs_end_transaction(trans, root);
+		btrfs_end_transaction(trans);
 		break;
 	case FLUSH_DELALLOC:
 	case FLUSH_DELALLOC_WAIT:
@@ -4836,7 +4836,7 @@ static int flush_space(struct btrfs_root *root,
 		ret = do_chunk_alloc(trans, fs_info,
 				     btrfs_get_alloc_profile(root, 0),
 				     CHUNK_ALLOC_NO_FORCE);
-		btrfs_end_transaction(trans, root);
+		btrfs_end_transaction(trans);
 		if (ret == -ENOSPC)
 			ret = 0;
 		break;
@@ -7629,7 +7629,7 @@ loop:
 			else
 				ret = 0;
 			if (!exist)
-				btrfs_end_transaction(trans, root);
+				btrfs_end_transaction(trans);
 			if (ret)
 				goto out;
 		}
@@ -9118,7 +9118,7 @@ int btrfs_drop_snapshot(struct btrfs_root *root,
 				goto out_end_trans;
 			}
 
-			btrfs_end_transaction_throttle(trans, tree_root);
+			btrfs_end_transaction_throttle(trans);
 			if (!for_reloc && btrfs_need_cleaner_sleep(fs_info)) {
 				pr_debug("BTRFS: drop snapshot early exit\n");
 				err = -EAGAIN;
@@ -9171,7 +9171,7 @@ int btrfs_drop_snapshot(struct btrfs_root *root,
 	}
 	root_dropped = true;
 out_end_trans:
-	btrfs_end_transaction_throttle(trans, tree_root);
+	btrfs_end_transaction_throttle(trans);
 out_free:
 	kfree(wc);
 	btrfs_free_path(path);
@@ -9380,7 +9380,7 @@ again:
 		u64 transid = trans->transid;
 
 		mutex_unlock(&fs_info->ro_block_group_mutex);
-		btrfs_end_transaction(trans, root);
+		btrfs_end_transaction(trans);
 
 		ret = btrfs_wait_for_commit(fs_info, transid);
 		if (ret)
@@ -9425,7 +9425,7 @@ out:
 	}
 	mutex_unlock(&fs_info->ro_block_group_mutex);
 
-	btrfs_end_transaction(trans, root);
+	btrfs_end_transaction(trans);
 	return ret;
 }
 
@@ -9644,7 +9644,7 @@ int btrfs_can_relocate(struct btrfs_fs_info *fs_info, u64 bytenr)
 			   "no space to allocate a new chunk for block group %llu",
 			   block_group->key.objectid);
 	mutex_unlock(&fs_info->chunk_mutex);
-	btrfs_end_transaction(trans, root);
+	btrfs_end_transaction(trans);
 out:
 	btrfs_put_block_group(block_group);
 	return ret;
@@ -10566,7 +10566,6 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 {
 	struct btrfs_block_group_cache *block_group;
 	struct btrfs_space_info *space_info;
-	struct btrfs_root *root = fs_info->extent_root;
 	struct btrfs_trans_handle *trans;
 	int ret = 0;
 
@@ -10717,7 +10716,7 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 			btrfs_get_block_group(block_group);
 		}
 end_trans:
-		btrfs_end_transaction(trans, root);
+		btrfs_end_transaction(trans);
 next:
 		mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 		btrfs_put_block_group(block_group);
