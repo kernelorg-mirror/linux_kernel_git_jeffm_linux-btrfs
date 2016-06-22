@@ -1094,10 +1094,11 @@ static const struct address_space_operations btree_aops = {
 
 void readahead_tree_block(struct btrfs_root *root, u64 bytenr)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *buf = NULL;
-	struct inode *btree_inode = root->fs_info->btree_inode;
+	struct inode *btree_inode = fs_info->btree_inode;
 
-	buf = btrfs_find_create_tree_block(root, bytenr);
+	buf = btrfs_find_create_tree_block(fs_info, bytenr);
 	if (IS_ERR(buf))
 		return;
 	read_extent_buffer_pages(&BTRFS_I(btree_inode)->io_tree,
@@ -1108,12 +1109,13 @@ void readahead_tree_block(struct btrfs_root *root, u64 bytenr)
 int reada_tree_block_flagged(struct btrfs_root *root, u64 bytenr,
 			 int mirror_num, struct extent_buffer **eb)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *buf = NULL;
-	struct inode *btree_inode = root->fs_info->btree_inode;
+	struct inode *btree_inode = fs_info->btree_inode;
 	struct extent_io_tree *io_tree = &BTRFS_I(btree_inode)->io_tree;
 	int ret;
 
-	buf = btrfs_find_create_tree_block(root, bytenr);
+	buf = btrfs_find_create_tree_block(fs_info, bytenr);
 	if (IS_ERR(buf))
 		return 0;
 
@@ -1143,10 +1145,10 @@ struct extent_buffer *btrfs_find_tree_block(struct btrfs_fs_info *fs_info,
 	return find_extent_buffer(fs_info, bytenr);
 }
 
-struct extent_buffer *btrfs_find_create_tree_block(struct btrfs_root *root,
-						 u64 bytenr)
+struct extent_buffer *btrfs_find_create_tree_block(
+						struct btrfs_fs_info *fs_info,
+						u64 bytenr)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	if (btrfs_is_testing(fs_info))
 		return alloc_test_extent_buffer(fs_info, bytenr,
 						fs_info->nodesize);
@@ -1169,10 +1171,11 @@ int btrfs_wait_tree_block_writeback(struct extent_buffer *buf)
 struct extent_buffer *read_tree_block(struct btrfs_root *root, u64 bytenr,
 				      u64 parent_transid)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_buffer *buf = NULL;
 	int ret;
 
-	buf = btrfs_find_create_tree_block(root, bytenr);
+	buf = btrfs_find_create_tree_block(fs_info, bytenr);
 	if (IS_ERR(buf))
 		return buf;
 
