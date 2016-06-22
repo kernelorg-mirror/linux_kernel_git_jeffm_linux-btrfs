@@ -306,8 +306,8 @@ static int process_one_buffer(struct btrfs_root *log,
 	}
 
 	if (wc->pin)
-		ret = btrfs_pin_extent_for_log_replay(fs_info->extent_root,
-						      eb->start, eb->len);
+		ret = btrfs_pin_extent_for_log_replay(fs_info, eb->start,
+						      eb->len);
 
 	if (!ret && btrfs_buffer_uptodate(eb, gen, 0)) {
 		if (wc->pin && btrfs_header_level(eb) == 0)

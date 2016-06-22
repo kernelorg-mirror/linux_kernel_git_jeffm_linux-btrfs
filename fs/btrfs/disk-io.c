@@ -4317,7 +4317,7 @@ static int btrfs_destroy_delayed_refs(struct btrfs_transaction *trans,
 		mutex_unlock(&head->mutex);
 
 		if (pin_bytes)
-			btrfs_pin_extent(root, head->node.bytenr,
+			btrfs_pin_extent(fs_info, head->node.bytenr,
 					 head->node.num_bytes, 1);
 		btrfs_put_delayed_ref(&head->node);
 		cond_resched();
