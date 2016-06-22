@@ -3810,9 +3810,8 @@ int btrfs_write_dirty_block_groups(struct btrfs_trans_handle *trans,
 	return ret;
 }
 
-int btrfs_extent_readonly(struct btrfs_root *root, u64 bytenr)
+int btrfs_extent_readonly(struct btrfs_fs_info *fs_info, u64 bytenr)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *block_group;
 	int readonly = 0;
 
