@@ -85,10 +85,9 @@ static int btrfs_decompress_biovec(int type, struct page **pages_in,
 				   u64 disk_start, struct bio_vec *bvec,
 				   int vcnt, size_t srclen);
 
-static inline int compressed_bio_size(struct btrfs_root *root,
+static inline int compressed_bio_size(struct btrfs_fs_info *fs_info,
 				      unsigned long disk_size)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u16 csum_size = btrfs_super_csum_size(fs_info->super_copy);
 
 	return sizeof(struct compressed_bio) +
@@ -344,7 +343,7 @@ int btrfs_submit_compressed_write(struct inode *inode, u64 start,
 	int skip_sum = BTRFS_I(inode)->flags & BTRFS_INODE_NODATASUM;
 
 	WARN_ON(start & ((u64)PAGE_SIZE - 1));
-	cb = kmalloc(compressed_bio_size(root, compressed_len), GFP_NOFS);
+	cb = kmalloc(compressed_bio_size(fs_info, compressed_len), GFP_NOFS);
 	if (!cb)
 		return -ENOMEM;
 	atomic_set(&cb->pending_bios, 0);
@@ -597,7 +596,7 @@ int btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
 		return -EIO;
 
 	compressed_len = em->block_len;
-	cb = kmalloc(compressed_bio_size(root, compressed_len), GFP_NOFS);
+	cb = kmalloc(compressed_bio_size(fs_info, compressed_len), GFP_NOFS);
 	if (!cb)
 		goto out;
 
