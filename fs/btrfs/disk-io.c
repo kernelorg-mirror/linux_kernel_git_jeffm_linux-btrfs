@@ -4446,10 +4446,8 @@ again:
 }
 
 void btrfs_cleanup_one_transaction(struct btrfs_transaction *cur_trans,
-				   struct btrfs_root *root)
+				   struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	btrfs_destroy_delayed_refs(cur_trans, fs_info);
 
 	cur_trans->state = TRANS_STATE_COMMIT_START;
@@ -4506,7 +4504,7 @@ static int btrfs_cleanup_transaction(struct btrfs_root *root)
 		} else {
 			spin_unlock(&fs_info->trans_lock);
 		}
-		btrfs_cleanup_one_transaction(t, root);
+		btrfs_cleanup_one_transaction(t, fs_info);
 
 		spin_lock(&fs_info->trans_lock);
 		if (t == fs_info->running_transaction)
