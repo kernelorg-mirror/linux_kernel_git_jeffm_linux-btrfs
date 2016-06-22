@@ -2319,10 +2319,9 @@ static void reada_for_search(struct btrfs_root *root,
 	}
 }
 
-static noinline void reada_for_balance(struct btrfs_root *root,
+static noinline void reada_for_balance(struct btrfs_fs_info *fs_info,
 				       struct btrfs_path *path, int level)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int slot;
 	int nritems;
 	struct extent_buffer *parent;
@@ -2563,7 +2562,7 @@ setup_nodes_for_search(struct btrfs_trans_handle *trans,
 		}
 
 		btrfs_set_path_blocking(p);
-		reada_for_balance(root, p, level);
+		reada_for_balance(fs_info, p, level);
 		sret = split_node(trans, root, p, level);
 		btrfs_clear_path_blocking(p, NULL, 0);
 
@@ -2584,7 +2583,7 @@ setup_nodes_for_search(struct btrfs_trans_handle *trans,
 		}
 
 		btrfs_set_path_blocking(p);
-		reada_for_balance(root, p, level);
+		reada_for_balance(fs_info, p, level);
 		sret = balance_level(trans, root, p, level);
 		btrfs_clear_path_blocking(p, NULL, 0);
 
