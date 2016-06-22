@@ -7983,11 +7983,10 @@ again:
 	return ret;
 }
 
-static int __btrfs_free_reserved_extent(struct btrfs_root *root,
+static int __btrfs_free_reserved_extent(struct btrfs_fs_info *fs_info,
 					u64 start, u64 len,
 					int pin, int delalloc)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *cache;
 	int ret = 0;
 
@@ -8013,16 +8012,16 @@ static int __btrfs_free_reserved_extent(struct btrfs_root *root,
 	return ret;
 }
 
-int btrfs_free_reserved_extent(struct btrfs_root *root,
+int btrfs_free_reserved_extent(struct btrfs_fs_info *fs_info,
 			       u64 start, u64 len, int delalloc)
 {
-	return __btrfs_free_reserved_extent(root, start, len, 0, delalloc);
+	return __btrfs_free_reserved_extent(fs_info, start, len, 0, delalloc);
 }
 
-int btrfs_free_and_pin_reserved_extent(struct btrfs_root *root,
+int btrfs_free_and_pin_reserved_extent(struct btrfs_fs_info *fs_info,
 				       u64 start, u64 len)
 {
-	return __btrfs_free_reserved_extent(root, start, len, 1, 0);
+	return __btrfs_free_reserved_extent(fs_info, start, len, 1, 0);
 }
 
 static int alloc_reserved_file_extent(struct btrfs_trans_handle *trans,
@@ -8123,7 +8122,7 @@ static int alloc_reserved_tree_block(struct btrfs_trans_handle *trans,
 
 	path = btrfs_alloc_path();
 	if (!path) {
-		btrfs_free_and_pin_reserved_extent(root, ins->objectid,
+		btrfs_free_and_pin_reserved_extent(fs_info, ins->objectid,
 						   fs_info->nodesize);
 		return -ENOMEM;
 	}
@@ -8133,7 +8132,7 @@ static int alloc_reserved_tree_block(struct btrfs_trans_handle *trans,
 				      ins, size);
 	if (ret) {
 		btrfs_free_path(path);
-		btrfs_free_and_pin_reserved_extent(root, ins->objectid,
+		btrfs_free_and_pin_reserved_extent(fs_info, ins->objectid,
 						   fs_info->nodesize);
 		return ret;
 	}
@@ -8428,7 +8427,7 @@ out_free_delayed:
 out_free_buf:
 	free_extent_buffer(buf);
 out_free_reserved:
-	btrfs_free_reserved_extent(root, ins.objectid, ins.offset, 0);
+	btrfs_free_reserved_extent(fs_info, ins.objectid, ins.offset, 0);
 out_unuse:
 	unuse_block_rsv(fs_info, block_rsv, blocksize);
 	return ERR_PTR(ret);

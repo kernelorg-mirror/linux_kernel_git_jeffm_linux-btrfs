@@ -864,7 +864,7 @@ retry:
 	return;
 out_free_reserve:
 	btrfs_dec_block_group_reservations(fs_info, ins.objectid);
-	btrfs_free_reserved_extent(root, ins.objectid, ins.offset, 1);
+	btrfs_free_reserved_extent(fs_info, ins.objectid, ins.offset, 1);
 out_free:
 	extent_clear_unlock_delalloc(inode, async_extent->start,
 				     async_extent->start +
@@ -1074,7 +1074,7 @@ out_drop_extent_cache:
 	btrfs_drop_extent_cache(inode, start, start + ram_size - 1, 0);
 out_reserve:
 	btrfs_dec_block_group_reservations(fs_info, ins.objectid);
-	btrfs_free_reserved_extent(root, ins.objectid, ins.offset, 1);
+	btrfs_free_reserved_extent(fs_info, ins.objectid, ins.offset, 1);
 out_unlock:
 	extent_clear_unlock_delalloc(inode, start, end, locked_page,
 				     EXTENT_LOCKED | EXTENT_DO_ACCOUNTING |
@@ -3014,7 +3014,8 @@ out:
 		if ((ret || !logical_len) &&
 		    !test_bit(BTRFS_ORDERED_NOCOW, &ordered_extent->flags) &&
 		    !test_bit(BTRFS_ORDERED_PREALLOC, &ordered_extent->flags))
-			btrfs_free_reserved_extent(root, ordered_extent->start,
+			btrfs_free_reserved_extent(fs_info,
+						   ordered_extent->start,
 						   ordered_extent->disk_len, 1);
 	}
 
@@ -7285,7 +7286,8 @@ static struct extent_map *btrfs_new_extent_direct(struct inode *inode,
 				     ins.offset, 0);
 	btrfs_dec_block_group_reservations(fs_info, ins.objectid);
 	if (IS_ERR(em))
-		btrfs_free_reserved_extent(root, ins.objectid, ins.offset, 1);
+		btrfs_free_reserved_extent(fs_info, ins.objectid,
+					   ins.offset, 1);
 
 	return em;
 }
@@ -10372,7 +10374,7 @@ static int __btrfs_prealloc_file_range(struct inode *inode, int mode,
 						  ins.offset, 0, 0, 0,
 						  BTRFS_FILE_EXTENT_PREALLOC);
 		if (ret) {
-			btrfs_free_reserved_extent(root, ins.objectid,
+			btrfs_free_reserved_extent(fs_info, ins.objectid,
 						   ins.offset, 0);
 			btrfs_abort_transaction(trans, ret);
 			if (own_trans)
