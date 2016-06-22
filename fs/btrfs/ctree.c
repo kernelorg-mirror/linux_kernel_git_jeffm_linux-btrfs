@@ -3857,13 +3857,12 @@ out_unlock:
  * items
  */
 static noinline int __push_leaf_left(struct btrfs_trans_handle *trans,
-				     struct btrfs_root *root,
+				     struct btrfs_fs_info *fs_info,
 				     struct btrfs_path *path, int data_size,
 				     int empty, struct extent_buffer *left,
 				     int free_space, u32 right_nritems,
 				     u32 max_slot)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_disk_key disk_key;
 	struct extent_buffer *right = path->nodes[0];
 	int i;
@@ -4063,7 +4062,7 @@ static int push_leaf_left(struct btrfs_trans_handle *trans, struct btrfs_root
 		goto out;
 	}
 
-	return __push_leaf_left(trans, root, path, min_data_size,
+	return __push_leaf_left(trans, fs_info, path, min_data_size,
 			       empty, left, free_space, right_nritems,
 			       max_slot);
 out:
