@@ -226,10 +226,9 @@ block_group_cache_tree_search(struct btrfs_fs_info *info, u64 bytenr,
 	return ret;
 }
 
-static int add_excluded_extent(struct btrfs_root *root,
+static int add_excluded_extent(struct btrfs_fs_info *fs_info,
 			       u64 start, u64 num_bytes)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	u64 end = start + num_bytes - 1;
 	set_extent_bits(&fs_info->freed_extents[0],
 			start, end, EXTENT_UPTODATE);
@@ -265,7 +264,7 @@ static int exclude_super_stripes(struct btrfs_root *root,
 	if (cache->key.objectid < BTRFS_SUPER_INFO_OFFSET) {
 		stripe_len = BTRFS_SUPER_INFO_OFFSET - cache->key.objectid;
 		cache->bytes_super += stripe_len;
-		ret = add_excluded_extent(root, cache->key.objectid,
+		ret = add_excluded_extent(fs_info, cache->key.objectid,
 					  stripe_len);
 		if (ret)
 			return ret;
@@ -300,7 +299,7 @@ static int exclude_super_stripes(struct btrfs_root *root,
 			}
 
 			cache->bytes_super += len;
-			ret = add_excluded_extent(root, start, len);
+			ret = add_excluded_extent(fs_info, start, len);
 			if (ret) {
 				kfree(logical);
 				return ret;
@@ -6197,9 +6196,8 @@ int btrfs_pin_extent_for_log_replay(struct btrfs_root *root,
 	return ret;
 }
 
-static int __exclude_logged_extent(struct btrfs_root *root, u64 start, u64 num_bytes)
+static int __exclude_logged_extent(struct btrfs_fs_info *fs_info, u64 start, u64 num_bytes)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	struct btrfs_block_group_cache *block_group;
 	struct btrfs_caching_control *caching_ctl;
@@ -6219,7 +6217,7 @@ static int __exclude_logged_extent(struct btrfs_root *root, u64 start, u64 num_b
 		mutex_lock(&caching_ctl->mutex);
 
 		if (start >= caching_ctl->progress) {
-			ret = add_excluded_extent(root, start, num_bytes);
+			ret = add_excluded_extent(fs_info, start, num_bytes);
 		} else if (start + num_bytes <= caching_ctl->progress) {
 			ret = btrfs_remove_free_space(block_group,
 						      start, num_bytes);
@@ -6233,7 +6231,7 @@ static int __exclude_logged_extent(struct btrfs_root *root, u64 start, u64 num_b
 			num_bytes = (start + num_bytes) -
 				caching_ctl->progress;
 			start = caching_ctl->progress;
-			ret = add_excluded_extent(root, start, num_bytes);
+			ret = add_excluded_extent(fs_info, start, num_bytes);
 		}
 out_lock:
 		mutex_unlock(&caching_ctl->mutex);
@@ -6243,7 +6241,7 @@ out_lock:
 	return ret;
 }
 
-int btrfs_exclude_logged_extents(struct btrfs_root *log,
+int btrfs_exclude_logged_extents(struct btrfs_fs_info *fs_info,
 				 struct extent_buffer *eb)
 {
 	struct btrfs_file_extent_item *item;
@@ -6251,7 +6249,7 @@ int btrfs_exclude_logged_extents(struct btrfs_root *log,
 	int found_type;
 	int i;
 
-	if (!btrfs_fs_incompat(log->fs_info, MIXED_GROUPS))
+	if (!btrfs_fs_incompat(fs_info, MIXED_GROUPS))
 		return 0;
 
 	for (i = 0; i < btrfs_header_nritems(eb); i++) {
@@ -6266,7 +6264,7 @@ int btrfs_exclude_logged_extents(struct btrfs_root *log,
 			continue;
 		key.objectid = btrfs_file_extent_disk_bytenr(eb, item);
 		key.offset = btrfs_file_extent_disk_num_bytes(eb, item);
-		__exclude_logged_extent(log, key.objectid, key.offset);
+		__exclude_logged_extent(fs_info, key.objectid, key.offset);
 	}
 
 	return 0;
