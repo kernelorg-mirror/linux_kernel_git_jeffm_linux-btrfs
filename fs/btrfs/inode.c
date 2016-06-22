@@ -8617,10 +8617,10 @@ free_ordered:
 	kfree(dip);
 }
 
-static ssize_t check_direct_IO(struct btrfs_root *root, struct kiocb *iocb,
-			const struct iov_iter *iter, loff_t offset)
+static ssize_t check_direct_IO(struct btrfs_fs_info *fs_info,
+			       struct kiocb *iocb,
+			       const struct iov_iter *iter, loff_t offset)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int seg;
 	int i;
 	unsigned int blocksize_mask = fs_info->sectorsize - 1;
@@ -8664,7 +8664,7 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 	bool relock = false;
 	ssize_t ret;
 
-	if (check_direct_IO(BTRFS_I(inode)->root, iocb, iter, offset))
+	if (check_direct_IO(fs_info, iocb, iter, offset))
 		return 0;
 
 	inode_dio_begin(inode);
