@@ -1169,7 +1169,7 @@ static noinline int commit_cowonly_roots(struct btrfs_trans_handle *trans,
 	if (ret)
 		return ret;
 
-	ret = btrfs_setup_space_cache(trans, root);
+	ret = btrfs_setup_space_cache(trans, fs_info);
 	if (ret)
 		return ret;
 
