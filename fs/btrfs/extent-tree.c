@@ -10153,7 +10153,6 @@ btrfs_create_block_group_cache(struct btrfs_fs_info *fs_info,
 
 int btrfs_read_block_groups(struct btrfs_fs_info *info)
 {
-	struct btrfs_root *root = info->extent_root;
 	struct btrfs_path *path;
 	int ret;
 	struct btrfs_block_group_cache *cache;
@@ -10283,7 +10282,7 @@ int btrfs_read_block_groups(struct btrfs_fs_info *info)
 		__link_block_group(space_info, cache);
 
 		set_avail_alloc_bits(info, cache->flags);
-		if (btrfs_chunk_readonly(root, cache->key.objectid)) {
+		if (btrfs_chunk_readonly(info, cache->key.objectid)) {
 			inc_block_group_ro(cache, 1);
 		} else if (btrfs_block_group_used(&cache->item) == 0) {
 			spin_lock(&info->unused_bgs_lock);

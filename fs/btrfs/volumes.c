@@ -4999,9 +4999,8 @@ static inline int btrfs_chunk_max_errors(struct map_lookup *map)
 	return max_errors;
 }
 
-int btrfs_chunk_readonly(struct btrfs_root *root, u64 chunk_offset)
+int btrfs_chunk_readonly(struct btrfs_fs_info *fs_info, u64 chunk_offset)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_map *em;
 	struct map_lookup *map;
 	struct btrfs_mapping_tree *map_tree = &fs_info->mapping_tree;
