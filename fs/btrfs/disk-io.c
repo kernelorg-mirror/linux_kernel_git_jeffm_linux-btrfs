@@ -70,7 +70,7 @@ static void btrfs_destroy_ordered_extents(struct btrfs_root *root);
 static int btrfs_destroy_delayed_refs(struct btrfs_transaction *trans,
 				      struct btrfs_fs_info *fs_info);
 static void btrfs_destroy_delalloc_inodes(struct btrfs_root *root);
-static int btrfs_destroy_marked_extents(struct btrfs_root *root,
+static int btrfs_destroy_marked_extents(struct btrfs_fs_info *fs_info,
 					struct extent_io_tree *dirty_pages,
 					int mark);
 static int btrfs_destroy_pinned_extent(struct btrfs_fs_info *fs_info,
@@ -4378,11 +4378,10 @@ static void btrfs_destroy_all_delalloc_inodes(struct btrfs_fs_info *fs_info)
 	spin_unlock(&fs_info->delalloc_root_lock);
 }
 
-static int btrfs_destroy_marked_extents(struct btrfs_root *root,
+static int btrfs_destroy_marked_extents(struct btrfs_fs_info *fs_info,
 					struct extent_io_tree *dirty_pages,
 					int mark)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int ret;
 	struct extent_buffer *eb;
 	u64 start = 0;
@@ -4462,7 +4461,7 @@ void btrfs_cleanup_one_transaction(struct btrfs_transaction *cur_trans,
 	btrfs_destroy_delayed_inodes(fs_info);
 	btrfs_assert_delayed_root_empty(fs_info);
 
-	btrfs_destroy_marked_extents(root, &cur_trans->dirty_pages,
+	btrfs_destroy_marked_extents(fs_info, &cur_trans->dirty_pages,
 				     EXTENT_DIRTY);
 	btrfs_destroy_pinned_extent(fs_info,
 				    fs_info->pinned_extents);
