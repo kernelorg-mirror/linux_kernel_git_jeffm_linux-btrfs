@@ -942,12 +942,11 @@ int btrfs_end_transaction_throttle(struct btrfs_trans_handle *trans,
  * them in one of two extent_io trees.  This is used to make sure all of
  * those extents are sent to disk but does not wait on them
  */
-int btrfs_write_marked_extents(struct btrfs_root *root,
+int btrfs_write_marked_extents(struct btrfs_fs_info *fs_info,
 			       struct extent_io_tree *dirty_pages, int mark)
 {
 	int err = 0;
 	int werr = 0;
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct address_space *mapping = fs_info->btree_inode->i_mapping;
 	struct extent_state *cached_state = NULL;
 	u64 start = 0;
@@ -1072,7 +1071,7 @@ static int btrfs_write_and_wait_marked_extents(struct btrfs_root *root,
 	struct blk_plug plug;
 
 	blk_start_plug(&plug);
-	ret = btrfs_write_marked_extents(root, dirty_pages, mark);
+	ret = btrfs_write_marked_extents(root->fs_info, dirty_pages, mark);
 	blk_finish_plug(&plug);
 	ret2 = btrfs_wait_marked_extents(root, dirty_pages, mark);
 
@@ -1084,7 +1083,7 @@ static int btrfs_write_and_wait_marked_extents(struct btrfs_root *root,
 }
 
 static int btrfs_write_and_wait_transaction(struct btrfs_trans_handle *trans,
-				     struct btrfs_root *root)
+					    struct btrfs_root *root)
 {
 	int ret;
 

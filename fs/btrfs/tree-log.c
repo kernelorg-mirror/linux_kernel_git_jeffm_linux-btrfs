@@ -2789,7 +2789,7 @@ int btrfs_sync_log(struct btrfs_trans_handle *trans,
 	 * wait for them until later.
 	 */
 	blk_start_plug(&plug);
-	ret = btrfs_write_marked_extents(log, &log->dirty_log_pages, mark);
+	ret = btrfs_write_marked_extents(fs_info, &log->dirty_log_pages, mark);
 	if (ret) {
 		blk_finish_plug(&plug);
 		btrfs_abort_transaction(trans, ret);
@@ -2896,7 +2896,7 @@ int btrfs_sync_log(struct btrfs_trans_handle *trans,
 		goto out_wake_log_root;
 	}
 
-	ret = btrfs_write_marked_extents(log_root_tree,
+	ret = btrfs_write_marked_extents(fs_info,
 					 &log_root_tree->dirty_log_pages,
 					 EXTENT_DIRTY | EXTENT_NEW);
 	blk_finish_plug(&plug);
