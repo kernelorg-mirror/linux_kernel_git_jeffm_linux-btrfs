@@ -844,7 +844,7 @@ static int __btrfs_end_transaction(struct btrfs_trans_handle *trans,
 		return 0;
 	}
 
-	btrfs_trans_release_metadata(trans, root);
+	btrfs_trans_release_metadata(trans, info);
 	trans->block_rsv = NULL;
 
 	if (!list_empty(&trans->new_bgs))
@@ -865,7 +865,7 @@ static int __btrfs_end_transaction(struct btrfs_trans_handle *trans,
 			must_run_delayed_refs = 2;
 	}
 
-	btrfs_trans_release_metadata(trans, root);
+	btrfs_trans_release_metadata(trans, info);
 	trans->block_rsv = NULL;
 
 	if (!list_empty(&trans->new_bgs))
@@ -1959,7 +1959,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 		return ret;
 	}
 
-	btrfs_trans_release_metadata(trans, root);
+	btrfs_trans_release_metadata(trans, fs_info);
 	trans->block_rsv = NULL;
 
 	cur_trans = trans->transaction;
@@ -2308,7 +2308,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 scrub_continue:
 	btrfs_scrub_continue(root);
 cleanup_transaction:
-	btrfs_trans_release_metadata(trans, root);
+	btrfs_trans_release_metadata(trans, fs_info);
 	btrfs_trans_release_chunk_metadata(trans);
 	trans->block_rsv = NULL;
 	btrfs_warn(fs_info, "Skipping commit of aborted transaction.");

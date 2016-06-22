@@ -5526,10 +5526,8 @@ static void release_global_block_rsv(struct btrfs_fs_info *fs_info)
 }
 
 void btrfs_trans_release_metadata(struct btrfs_trans_handle *trans,
-				  struct btrfs_root *root)
+				  struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
 	if (!trans->block_rsv)
 		return;
 
