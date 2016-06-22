@@ -1703,9 +1703,8 @@ static noinline int create_pending_snapshots(struct btrfs_trans_handle *trans,
 	return ret;
 }
 
-static void update_super_roots(struct btrfs_root *root)
+static void update_super_roots(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_root_item *root_item;
 	struct btrfs_super_block *super;
 
@@ -2215,7 +2214,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 	assert_qgroups_uptodate(trans);
 	ASSERT(list_empty(&cur_trans->dirty_bgs));
 	ASSERT(list_empty(&cur_trans->io_bgs));
-	update_super_roots(root);
+	update_super_roots(fs_info);
 
 	btrfs_set_super_log_root(fs_info->super_copy, 0);
 	btrfs_set_super_log_root_level(fs_info->super_copy, 0);
