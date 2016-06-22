@@ -6553,9 +6553,8 @@ static int btrfs_update_reserved_bytes(struct btrfs_block_group_cache *cache,
 }
 
 void btrfs_prepare_extent_commit(struct btrfs_trans_handle *trans,
-				struct btrfs_root *root)
+				struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_caching_control *next;
 	struct btrfs_caching_control *caching_ctl;
 	struct btrfs_block_group_cache *cache;
@@ -6714,9 +6713,8 @@ static int unpin_extent_range(struct btrfs_fs_info *fs_info,
 }
 
 int btrfs_finish_extent_commit(struct btrfs_trans_handle *trans,
-			       struct btrfs_root *root)
+			       struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *block_group, *tmp;
 	struct list_head *deleted_bgs;
 	struct extent_io_tree *unpin;

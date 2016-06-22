@@ -2197,7 +2197,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 		goto scrub_continue;
 	}
 
-	btrfs_prepare_extent_commit(trans, root);
+	btrfs_prepare_extent_commit(trans, fs_info);
 
 	cur_trans = fs_info->running_transaction;
 
@@ -2259,7 +2259,7 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans,
 	 */
 	mutex_unlock(&fs_info->tree_log_mutex);
 
-	btrfs_finish_extent_commit(trans, root);
+	btrfs_finish_extent_commit(trans, fs_info);
 
 	if (test_bit(BTRFS_TRANS_HAVE_FREE_BGS, &cur_trans->flags))
 		btrfs_clear_space_info_full(fs_info);
