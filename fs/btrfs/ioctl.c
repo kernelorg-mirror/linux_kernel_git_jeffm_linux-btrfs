@@ -5390,12 +5390,11 @@ static int btrfs_ioctl_get_features(struct file *file, void __user *arg)
 	return 0;
 }
 
-static int check_feature_bits(struct btrfs_root *root,
+static int check_feature_bits(struct btrfs_fs_info *fs_info,
 			      enum btrfs_feature_set set,
 			      u64 change_mask, u64 flags, u64 supported_flags,
 			      u64 safe_set, u64 safe_clear)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	const char *type = btrfs_feature_set_names[set];
 	char *names;
 	u64 disallowed, unsupported;
@@ -5450,8 +5449,8 @@ static int check_feature_bits(struct btrfs_root *root,
 	return 0;
 }
 
-#define check_feature(root, change_mask, flags, mask_base)	\
-check_feature_bits(root, FEAT_##mask_base, change_mask, flags,	\
+#define check_feature(fs_info, change_mask, flags, mask_base)	\
+check_feature_bits(fs_info, FEAT_##mask_base, change_mask, flags,	\
 		   BTRFS_FEATURE_ ## mask_base ## _SUPP,	\
 		   BTRFS_FEATURE_ ## mask_base ## _SAFE_SET,	\
 		   BTRFS_FEATURE_ ## mask_base ## _SAFE_CLEAR)
@@ -5478,17 +5477,17 @@ static int btrfs_ioctl_set_features(struct file *file, void __user *arg)
 	    !flags[0].incompat_flags)
 		return 0;
 
-	ret = check_feature(root, flags[0].compat_flags,
+	ret = check_feature(fs_info, flags[0].compat_flags,
 			    flags[1].compat_flags, COMPAT);
 	if (ret)
 		return ret;
 
-	ret = check_feature(root, flags[0].compat_ro_flags,
+	ret = check_feature(fs_info, flags[0].compat_ro_flags,
 			    flags[1].compat_ro_flags, COMPAT_RO);
 	if (ret)
 		return ret;
 
-	ret = check_feature(root, flags[0].incompat_flags,
+	ret = check_feature(fs_info, flags[0].incompat_flags,
 			    flags[1].incompat_flags, INCOMPAT);
 	if (ret)
 		return ret;
