@@ -437,7 +437,7 @@ static int load_extent_tree_free(struct btrfs_caching_control *caching_ctl)
 	 * allocate from this block group until we've had a chance to fragment
 	 * the free space.
 	 */
-	if (btrfs_should_fragment_free_space(extent_root, block_group))
+	if (btrfs_should_fragment_free_space(block_group))
 		wakeup = false;
 #endif
 	/*
@@ -576,7 +576,7 @@ static noinline void caching_thread(struct btrfs_work *work)
 	spin_unlock(&block_group->lock);
 
 #ifdef CONFIG_BTRFS_DEBUG
-	if (btrfs_should_fragment_free_space(extent_root, block_group)) {
+	if (btrfs_should_fragment_free_space(block_group)) {
 		u64 bytes_used;
 
 		spin_lock(&block_group->space_info->lock);
@@ -683,8 +683,7 @@ static int cache_block_group(struct btrfs_block_group_cache *cache,
 		spin_unlock(&cache->lock);
 #ifdef CONFIG_BTRFS_DEBUG
 		if (ret == 1 &&
-		    btrfs_should_fragment_free_space(fs_info->extent_root,
-						     cache)) {
+		    btrfs_should_fragment_free_space(cache)) {
 			u64 bytes_used;
 
 			spin_lock(&cache->space_info->lock);
@@ -10428,7 +10427,7 @@ int btrfs_make_block_group(struct btrfs_trans_handle *trans,
 	free_excluded_extents(root, cache);
 
 #ifdef CONFIG_BTRFS_DEBUG
-	if (btrfs_should_fragment_free_space(root, cache)) {
+	if (btrfs_should_fragment_free_space(cache)) {
 		u64 new_bytes_used = size - bytes_used;
 
 		bytes_used += new_bytes_used >> 1;

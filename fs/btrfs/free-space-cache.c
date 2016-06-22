@@ -1979,7 +1979,7 @@ static bool use_bitmap(struct btrfs_free_space_ctl *ctl,
 	bool forced = false;
 
 #ifdef CONFIG_BTRFS_DEBUG
-	if (btrfs_should_fragment_free_space(fs_info->extent_root, block_group))
+	if (btrfs_should_fragment_free_space(block_group))
 		forced = true;
 #endif
 
