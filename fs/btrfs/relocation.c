@@ -2239,7 +2239,7 @@ static noinline_for_stack int merge_reloc_root(struct reloc_control *rc,
 			       path->slots[level]);
 		root_item->drop_level = level;
 
-		btrfs_end_transaction_throttle(trans, root);
+		btrfs_end_transaction_throttle(trans);
 		trans = NULL;
 
 		btrfs_btree_balance_dirty(fs_info);
@@ -2270,7 +2270,7 @@ out:
 	}
 
 	if (trans)
-		btrfs_end_transaction_throttle(trans, root);
+		btrfs_end_transaction_throttle(trans);
 
 	btrfs_btree_balance_dirty(fs_info);
 
@@ -2315,7 +2315,7 @@ again:
 
 	if (!err) {
 		if (num_bytes != rc->merging_rsv_size) {
-			btrfs_end_transaction(trans, rc->extent_root);
+			btrfs_end_transaction(trans);
 			btrfs_block_rsv_release(fs_info, rc->block_rsv,
 						num_bytes);
 			goto again;
@@ -2349,7 +2349,7 @@ again:
 	if (!err)
 		btrfs_commit_transaction(trans);
 	else
-		btrfs_end_transaction(trans, rc->extent_root);
+		btrfs_end_transaction(trans);
 	return err;
 }
 
@@ -3509,7 +3509,7 @@ truncate:
 
 	ret = btrfs_truncate_free_space_cache(root, trans, block_group, inode);
 
-	btrfs_end_transaction(trans, root);
+	btrfs_end_transaction(trans);
 	btrfs_btree_balance_dirty(fs_info);
 out:
 	iput(inode);
@@ -4071,7 +4071,7 @@ static noinline_for_stack int relocate_block_group(struct reloc_control *rc)
 		}
 restart:
 		if (update_backref_cache(trans, &rc->backref_cache)) {
-			btrfs_end_transaction(trans, rc->extent_root);
+			btrfs_end_transaction(trans);
 			continue;
 		}
 
@@ -4159,7 +4159,7 @@ restart:
 			}
 		}
 
-		btrfs_end_transaction_throttle(trans, rc->extent_root);
+		btrfs_end_transaction_throttle(trans);
 		btrfs_btree_balance_dirty(fs_info);
 		trans = NULL;
 
@@ -4188,7 +4188,7 @@ restart:
 	clear_extent_bits(&rc->processed_blocks, 0, (u64)-1, EXTENT_DIRTY);
 
 	if (trans) {
-		btrfs_end_transaction_throttle(trans, rc->extent_root);
+		btrfs_end_transaction_throttle(trans);
 		btrfs_btree_balance_dirty(fs_info);
 	}
 
@@ -4302,7 +4302,7 @@ struct inode *create_reloc_inode(struct btrfs_fs_info *fs_info,
 
 	err = btrfs_orphan_add(trans, inode);
 out:
-	btrfs_end_transaction(trans, root);
+	btrfs_end_transaction(trans);
 	btrfs_btree_balance_dirty(fs_info);
 	if (err) {
 		if (inode)
@@ -4449,7 +4449,7 @@ static noinline_for_stack int mark_garbage_root(struct btrfs_root *root)
 	ret = btrfs_update_root(trans, fs_info->tree_root,
 				&root->root_key, &root->root_item);
 
-	err = btrfs_end_transaction(trans, fs_info->tree_root);
+	err = btrfs_end_transaction(trans);
 	if (err)
 		return err;
 	return ret;
