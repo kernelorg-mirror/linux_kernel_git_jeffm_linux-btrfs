@@ -330,9 +330,8 @@ void btrfs_print_leaf(struct btrfs_fs_info *fs_info, struct extent_buffer *l)
 	}
 }
 
-void btrfs_print_tree(struct btrfs_root *root, struct extent_buffer *c)
+void btrfs_print_tree(struct btrfs_fs_info *fs_info, struct extent_buffer *c)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	int i; u32 nr;
 	struct btrfs_key key;
 	int level;
@@ -364,7 +363,7 @@ void btrfs_print_tree(struct btrfs_root *root, struct extent_buffer *c)
 		if (btrfs_header_level(next) !=
 		       level - 1)
 			BUG();
-		btrfs_print_tree(root, next);
+		btrfs_print_tree(fs_info, next);
 		free_extent_buffer(next);
 	}
 }
