@@ -3315,11 +3315,10 @@ static int chunk_soft_convert_filter(u64 chunk_type,
 	return 0;
 }
 
-static int should_balance_chunk(struct btrfs_root *root,
+static int should_balance_chunk(struct btrfs_fs_info *fs_info,
 				struct extent_buffer *leaf,
 				struct btrfs_chunk *chunk, u64 chunk_offset)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_balance_control *bctl = fs_info->balance_ctl;
 	struct btrfs_balance_args *bargs = NULL;
 	u64 chunk_type = btrfs_chunk_type(leaf, chunk);
@@ -3533,7 +3532,7 @@ again:
 			spin_unlock(&fs_info->balance_lock);
 		}
 
-		ret = should_balance_chunk(chunk_root, leaf, chunk,
+		ret = should_balance_chunk(fs_info, leaf, chunk,
 					   found_key.offset);
 
 		btrfs_release_path(path);
