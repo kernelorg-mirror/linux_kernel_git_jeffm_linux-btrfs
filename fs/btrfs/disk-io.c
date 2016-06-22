@@ -494,7 +494,7 @@ static int btree_read_extent_buffer_pages(struct btrfs_root *root,
 	}
 
 	if (failed && !ret && failed_mirror)
-		repair_eb_io_failure(root, eb, failed_mirror);
+		repair_eb_io_failure(fs_info, eb, failed_mirror);
 
 	return ret;
 }
