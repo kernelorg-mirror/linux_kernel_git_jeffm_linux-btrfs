@@ -199,7 +199,8 @@ static int do_setxattr(struct btrfs_trans_handle *trans,
 				btrfs_extend_item(fs_info, path,
 						  size - old_data_len);
 			else if (size < old_data_len)
-				btrfs_truncate_item(root, path, data_size, 1);
+				btrfs_truncate_item(fs_info, path,
+						    data_size, 1);
 		} else {
 			/* There are other xattrs packed in the same item. */
 			ret = btrfs_delete_one_dir_name(trans, root, path, di);
