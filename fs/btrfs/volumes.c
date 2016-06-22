@@ -2127,9 +2127,8 @@ int btrfs_find_device_by_devspec(struct btrfs_fs_info *fs_info, u64 devid,
 /*
  * does all the dirty work required for changing file system's UUID.
  */
-static int btrfs_prepare_sprout(struct btrfs_root *root)
+static int btrfs_prepare_sprout(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
 	struct btrfs_fs_devices *old_devices;
 	struct btrfs_fs_devices *seed_devices;
@@ -2349,7 +2348,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, char *device_path)
 
 	if (seeding_dev) {
 		sb->s_flags &= ~MS_RDONLY;
-		ret = btrfs_prepare_sprout(root);
+		ret = btrfs_prepare_sprout(fs_info);
 		BUG_ON(ret); /* -ENOMEM */
 	}
 
