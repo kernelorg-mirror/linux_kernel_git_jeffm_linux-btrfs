@@ -49,8 +49,9 @@ struct extent_buffer *read_tree_block(struct btrfs_root *root, u64 bytenr,
 void readahead_tree_block(struct btrfs_root *root, u64 bytenr);
 int reada_tree_block_flagged(struct btrfs_root *root, u64 bytenr,
 			 int mirror_num, struct extent_buffer **eb);
-struct extent_buffer *btrfs_find_create_tree_block(struct btrfs_root *root,
-						   u64 bytenr);
+struct extent_buffer *btrfs_find_create_tree_block(
+						struct btrfs_fs_info *fs_info,
+						u64 bytenr);
 void clean_tree_block(struct btrfs_trans_handle *trans,
 		      struct btrfs_fs_info *fs_info, struct extent_buffer *buf);
 int open_ctree(struct super_block *sb,
