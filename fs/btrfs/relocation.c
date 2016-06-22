@@ -2347,7 +2347,7 @@ again:
 	list_splice(&reloc_roots, &rc->reloc_roots);
 
 	if (!err)
-		btrfs_commit_transaction(trans, rc->extent_root);
+		btrfs_commit_transaction(trans);
 	else
 		btrfs_end_transaction(trans, rc->extent_root);
 	return err;
@@ -3940,7 +3940,7 @@ int prepare_to_relocate(struct reloc_control *rc)
 		 */
 		return PTR_ERR(trans);
 	}
-	btrfs_commit_transaction(trans, rc->extent_root);
+	btrfs_commit_transaction(trans);
 	return 0;
 }
 
@@ -4226,7 +4226,7 @@ restart:
 			err = ret;
 		goto out_free;
 	}
-	btrfs_commit_transaction(trans, rc->extent_root);
+	btrfs_commit_transaction(trans);
 out_free:
 	btrfs_free_block_rsv(fs_info, rc->block_rsv);
 	btrfs_free_path(path);
@@ -4580,7 +4580,7 @@ int btrfs_recover_relocation(struct btrfs_root *root)
 		fs_root->reloc_root = reloc_root;
 	}
 
-	err = btrfs_commit_transaction(trans, rc->extent_root);
+	err = btrfs_commit_transaction(trans);
 	if (err)
 		goto out_free;
 
@@ -4598,7 +4598,7 @@ int btrfs_recover_relocation(struct btrfs_root *root)
 		btrfs_abort_transaction(trans, err);
 		goto out_free;
 	}
-	err = btrfs_commit_transaction(trans, rc->extent_root);
+	err = btrfs_commit_transaction(trans);
 out_free:
 	kfree(rc);
 out:
