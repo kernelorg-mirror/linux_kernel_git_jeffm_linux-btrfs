@@ -134,7 +134,7 @@ const int btrfs_raid_mindev_error[BTRFS_NR_RAID_TYPES] = {
 };
 
 static int init_first_rw_device(struct btrfs_trans_handle *trans,
-				struct btrfs_root *root,
+				struct btrfs_fs_info *fs_info,
 				struct btrfs_device *device);
 static int btrfs_relocate_sys_chunks(struct btrfs_fs_info *fs_info);
 static void __btrfs_reset_dev_stats(struct btrfs_device *dev);
@@ -2394,7 +2394,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, char *device_path)
 
 	if (seeding_dev) {
 		lock_chunks(fs_info);
-		ret = init_first_rw_device(trans, root, device);
+		ret = init_first_rw_device(trans, fs_info, device);
 		unlock_chunks(fs_info);
 		if (ret) {
 			btrfs_abort_transaction(trans, ret);
@@ -4950,14 +4950,13 @@ int btrfs_alloc_chunk(struct btrfs_trans_handle *trans,
 }
 
 static noinline int init_first_rw_device(struct btrfs_trans_handle *trans,
-					 struct btrfs_root *root,
+					 struct btrfs_fs_info *fs_info,
 					 struct btrfs_device *device)
 {
+	struct btrfs_root *extent_root = fs_info->extent_root;
 	u64 chunk_offset;
 	u64 sys_chunk_offset;
 	u64 alloc_profile;
-	struct btrfs_fs_info *fs_info = root->fs_info;
-	struct btrfs_root *extent_root = fs_info->extent_root;
 	int ret;
 
 	chunk_offset = find_next_chunk(fs_info);
