@@ -2913,7 +2913,7 @@ int __must_check btrfs_update_root(struct btrfs_trans_handle *trans,
 int btrfs_find_root(struct btrfs_root *root, struct btrfs_key *search_key,
 		    struct btrfs_path *path, struct btrfs_root_item *root_item,
 		    struct btrfs_key *root_key);
-int btrfs_find_orphan_roots(struct btrfs_root *tree_root);
+int btrfs_find_orphan_roots(struct btrfs_fs_info *fs_info);
 void btrfs_set_root_node(struct btrfs_root_item *item,
 			 struct extent_buffer *node);
 void btrfs_check_and_init_root_item(struct btrfs_root_item *item);

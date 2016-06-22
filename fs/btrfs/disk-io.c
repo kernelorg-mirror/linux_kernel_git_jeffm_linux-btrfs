@@ -3070,7 +3070,7 @@ retry_root_backup:
 		}
 	}
 
-	ret = btrfs_find_orphan_roots(tree_root);
+	ret = btrfs_find_orphan_roots(fs_info);
 	if (ret)
 		goto fail_qgroup;
 
