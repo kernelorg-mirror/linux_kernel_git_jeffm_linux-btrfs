@@ -1803,7 +1803,7 @@ static int cleaner_kthread(void *arg)
 		again = 0;
 
 		/* Make the cleaner go to sleep early. */
-		if (btrfs_need_cleaner_sleep(root))
+		if (btrfs_need_cleaner_sleep(fs_info))
 			goto sleep;
 
 		/*
@@ -1820,7 +1820,7 @@ static int cleaner_kthread(void *arg)
 		 * Avoid the problem that we change the status of the fs
 		 * during the above check and trylock.
 		 */
-		if (btrfs_need_cleaner_sleep(root)) {
+		if (btrfs_need_cleaner_sleep(fs_info)) {
 			mutex_unlock(&fs_info->cleaner_mutex);
 			goto sleep;
 		}

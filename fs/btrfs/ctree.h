@@ -2871,11 +2871,9 @@ static inline int btrfs_fs_closing(struct btrfs_fs_info *fs_info)
  * anything except sleeping. This function is used to check the status of
  * the fs.
  */
-static inline int btrfs_need_cleaner_sleep(struct btrfs_root *root)
+static inline int btrfs_need_cleaner_sleep(struct btrfs_fs_info *fs_info)
 {
-	struct btrfs_fs_info *fs_info = root->fs_info;
-
-	return (fs_info->sb->s_flags & MS_RDONLY || btrfs_fs_closing(fs_info));
+	return fs_info->sb->s_flags & MS_RDONLY || btrfs_fs_closing(fs_info);
 }
 
 static inline void free_fs_info(struct btrfs_fs_info *fs_info)
