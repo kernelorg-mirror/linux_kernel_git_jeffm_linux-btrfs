@@ -156,9 +156,10 @@ out:
 }
 
 int btrfs_uuid_tree_rem(struct btrfs_trans_handle *trans,
-			struct btrfs_root *uuid_root, u8 *uuid, u8 type,
+			struct btrfs_fs_info *fs_info, u8 *uuid, u8 type,
 			u64 subid)
 {
+	struct btrfs_root *uuid_root = fs_info->uuid_root;
 	int ret;
 	struct btrfs_path *path = NULL;
 	struct btrfs_key key;
@@ -249,7 +250,7 @@ static int btrfs_uuid_iter_rem(struct btrfs_root *uuid_root, u8 *uuid, u8 type,
 		goto out;
 	}
 
-	ret = btrfs_uuid_tree_rem(trans, uuid_root, uuid, type, subid);
+	ret = btrfs_uuid_tree_rem(trans, uuid_root->fs_info, uuid, type, subid);
 	btrfs_end_transaction(trans, uuid_root);
 
 out:
