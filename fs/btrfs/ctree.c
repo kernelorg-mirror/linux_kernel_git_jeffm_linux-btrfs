@@ -5260,19 +5260,18 @@ out:
 	return ret;
 }
 
-static void tree_move_down(struct btrfs_root *root,
+static void tree_move_down(struct btrfs_fs_info *fs_info,
 			   struct btrfs_path *path,
 			   int *level, int root_level)
 {
 	BUG_ON(*level == 0);
-	path->nodes[*level - 1] = read_node_slot(root->fs_info,
-					path->nodes[*level],
+	path->nodes[*level - 1] = read_node_slot(fs_info, path->nodes[*level],
 					path->slots[*level]);
 	path->slots[*level - 1] = 0;
 	(*level)--;
 }
 
-static int tree_move_next_or_upnext(struct btrfs_root *root,
+static int tree_move_next_or_upnext(struct btrfs_fs_info *fs_info,
 				    struct btrfs_path *path,
 				    int *level, int root_level)
 {
@@ -5303,7 +5302,7 @@ static int tree_move_next_or_upnext(struct btrfs_root *root,
  * Returns 1 if it had to move up and next. 0 is returned if it moved only next
  * or down.
  */
-static int tree_advance(struct btrfs_root *root,
+static int tree_advance(struct btrfs_fs_info *fs_info,
 			struct btrfs_path *path,
 			int *level, int root_level,
 			int allow_down,
@@ -5312,9 +5311,10 @@ static int tree_advance(struct btrfs_root *root,
 	int ret;
 
 	if (*level == 0 || !allow_down) {
-		ret = tree_move_next_or_upnext(root, path, level, root_level);
+		ret = tree_move_next_or_upnext(fs_info, path, level,
+					       root_level);
 	} else {
-		tree_move_down(root, path, level, root_level);
+		tree_move_down(fs_info, path, level, root_level);
 		ret = 0;
 	}
 	if (ret >= 0) {
@@ -5486,7 +5486,7 @@ int btrfs_compare_trees(struct btrfs_root *left_root,
 
 	while (1) {
 		if (advance_left && !left_end_reached) {
-			ret = tree_advance(left_root, left_path, &left_level,
+			ret = tree_advance(fs_info, left_path, &left_level,
 					left_root_level,
 					advance_left != ADVANCE_ONLY_NEXT,
 					&left_key);
@@ -5495,7 +5495,7 @@ int btrfs_compare_trees(struct btrfs_root *left_root,
 			advance_left = 0;
 		}
 		if (advance_right && !right_end_reached) {
-			ret = tree_advance(right_root, right_path, &right_level,
+			ret = tree_advance(fs_info, right_path, &right_level,
 					right_root_level,
 					advance_right != ADVANCE_ONLY_NEXT,
 					&right_key);
