@@ -36,10 +36,6 @@
 #include "transaction.h"
 #include "compression.h"
 
-static int g_verbose = 0;
-
-#define verbose_printk(...) if (g_verbose) printk(__VA_ARGS__)
-
 /*
  * A fs_path is a helper to dynamically build path names with unknown size.
  * It reallocates the internal buffer on demand.
@@ -697,7 +693,8 @@ static int send_rename(struct send_ctx *sctx,
 {
 	int ret;
 
-verbose_printk("btrfs: send_rename %s -> %s\n", from->start, to->start);
+	btrfs_debug(sctx->send_root->fs_info, "%s %s -> %s",
+		    __func__, from->start, to->start);
 
 	ret = begin_cmd(sctx, BTRFS_SEND_C_RENAME);
 	if (ret < 0)
@@ -721,7 +718,8 @@ static int send_link(struct send_ctx *sctx,
 {
 	int ret;
 
-verbose_printk("btrfs: send_link %s -> %s\n", path->start, lnk->start);
+	btrfs_debug(sctx->send_root->fs_info, "%s %s -> %s",
+		    __func__, path->start, lnk->start);
 
 	ret = begin_cmd(sctx, BTRFS_SEND_C_LINK);
 	if (ret < 0)
@@ -744,7 +742,7 @@ static int send_unlink(struct send_ctx *sctx, struct fs_path *path)
 {
 	int ret;
 
-verbose_printk("btrfs: send_unlink %s\n", path->start);
+	btrfs_debug(sctx->send_root->fs_info, "%s %s", __func__, path->start);
 
 	ret = begin_cmd(sctx, BTRFS_SEND_C_UNLINK);
 	if (ret < 0)
@@ -766,7 +764,7 @@ static int send_rmdir(struct send_ctx *sctx, struct fs_path *path)
 {
 	int ret;
 
-verbose_printk("btrfs: send_rmdir %s\n", path->start);
+	btrfs_debug(sctx->send_root->fs_info, "%s %s", __func__, path->start);
 
 	ret = begin_cmd(sctx, BTRFS_SEND_C_RMDIR);
 	if (ret < 0)
@@ -1415,13 +1413,12 @@ static int find_extent_clone(struct send_ctx *sctx,
 		goto out;
 	}
 
-verbose_printk(KERN_DEBUG "btrfs: find_extent_clone: data_offset=%llu, "
-		"ino=%llu, "
-		"num_bytes=%llu, logical=%llu\n",
-		data_offset, ino, num_bytes, logical);
+	btrfs_debug(fs_info,
+		    "%s: data_offset=%llu, ino=%llu, num_bytes=%llu, logical=%llu",
+		    __func__, data_offset, ino, num_bytes, logical);
 
 	if (!backref_ctx->found)
-		verbose_printk("btrfs:    no clones found\n");
+		btrfs_debug(fs_info, "%s: no clones found", __func__);
 
 	cur_clone_root = NULL;
 	for (i = 0; i < sctx->clone_roots_cnt; i++) {
@@ -2394,7 +2391,8 @@ static int send_truncate(struct send_ctx *sctx, u64 ino, u64 gen, u64 size)
 	int ret = 0;
 	struct fs_path *p;
 
-verbose_printk("btrfs: send_truncate %llu size=%llu\n", ino, size);
+	btrfs_debug(sctx->send_root->fs_info, "%s %llu size=%llu",
+		    __func__, ino, size);
 
 	p = fs_path_alloc();
 	if (!p)
@@ -2423,7 +2421,8 @@ static int send_chmod(struct send_ctx *sctx, u64 ino, u64 gen, u64 mode)
 	int ret = 0;
 	struct fs_path *p;
 
-verbose_printk("btrfs: send_chmod %llu mode=%llu\n", ino, mode);
+	btrfs_debug(sctx->send_root->fs_info, "%s %llu mode=%llu",
+		    __func__, ino, mode);
 
 	p = fs_path_alloc();
 	if (!p)
@@ -2452,7 +2451,8 @@ static int send_chown(struct send_ctx *sctx, u64 ino, u64 gen, u64 uid, u64 gid)
 	int ret = 0;
 	struct fs_path *p;
 
-verbose_printk("btrfs: send_chown %llu uid=%llu, gid=%llu\n", ino, uid, gid);
+	btrfs_debug(sctx->send_root->fs_info, "%s %llu uid=%llu, gid=%llu",
+		    __func__, ino, uid, gid);
 
 	p = fs_path_alloc();
 	if (!p)
@@ -2487,7 +2487,7 @@ static int send_utimes(struct send_ctx *sctx, u64 ino, u64 gen)
 	struct btrfs_key key;
 	int slot;
 
-verbose_printk("btrfs: send_utimes %llu\n", ino);
+	btrfs_debug(sctx->send_root->fs_info, "%s %llu", __func__, ino);
 
 	p = fs_path_alloc();
 	if (!p)
@@ -2546,7 +2546,7 @@ static int send_create_inode(struct send_ctx *sctx, u64 ino)
 	u64 mode;
 	u64 rdev;
 
-verbose_printk("btrfs: send_create_inode %llu\n", ino);
+	btrfs_debug(sctx->send_root->fs_info, "%s %llu", __func__, ino);
 
 	p = fs_path_alloc();
 	if (!p)
@@ -3538,7 +3538,8 @@ static int process_recorded_refs(struct send_ctx *sctx, int *pending_move)
 	u64 last_dir_ino_rm = 0;
 	bool can_rename = true;
 
-verbose_printk("btrfs: process_recorded_refs %llu\n", sctx->cur_ino);
+	btrfs_debug(sctx->send_root->fs_info, "%s %llu",
+		    __func__, sctx->cur_ino);
 
 	/*
 	 * This should never happen as the root dir always has the same ref
@@ -4530,7 +4531,8 @@ static int send_write(struct send_ctx *sctx, u64 offset, u32 len)
 	if (!p)
 		return -ENOMEM;
 
-verbose_printk("btrfs: send_write offset=%llu, len=%d\n", offset, len);
+	btrfs_debug(sctx->send_root->fs_info, "%s offset=%llu, len=%d",
+		    __func__, offset, len);
 
 	num_read = fill_read_buf(sctx, offset, len);
 	if (num_read <= 0) {
@@ -4572,10 +4574,10 @@ static int send_clone(struct send_ctx *sctx,
 	struct fs_path *p;
 	u64 gen;
 
-verbose_printk("btrfs: send_clone offset=%llu, len=%d, clone_root=%llu, "
-	       "clone_inode=%llu, clone_offset=%llu\n", offset, len,
-		clone_root->root->objectid, clone_root->ino,
-		clone_root->offset);
+	btrfs_debug(sctx->send_root->fs_info,
+		    "%s offset=%llu, len=%d, clone_root=%llu, clone_inode=%llu, clone_offset=%llu",
+		    __func__, offset, len, clone_root->root->objectid,
+		    clone_root->ino, clone_root->offset);
 
 	p = fs_path_alloc();
 	if (!p)
