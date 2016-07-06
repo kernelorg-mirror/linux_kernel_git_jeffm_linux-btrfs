@@ -7979,6 +7979,7 @@ static int __btrfs_free_reserved_extent(struct btrfs_root *root,
 					u64 start, u64 len,
 					int pin, int delalloc)
 {
+	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_block_group_cache *cache;
 	int ret = 0;
 
@@ -7996,7 +7997,8 @@ static int __btrfs_free_reserved_extent(struct btrfs_root *root,
 			ret = btrfs_discard_extent(root, start, len, NULL);
 		btrfs_add_free_space(cache, start, len);
 		btrfs_update_reserved_bytes(cache, len, RESERVE_FREE, delalloc);
-		trace_btrfs_reserved_extent_free(root, start, len);
+		trace_btrfs_reserved_extent_free(fs_info->extent_root,
+						 start, len);
 	}
 
 	btrfs_put_block_group(cache);
