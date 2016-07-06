@@ -2225,10 +2225,11 @@ qgroup_rescan_leaf(struct btrfs_fs_info *fs_info, struct btrfs_path *path,
 					 &fs_info->qgroup_rescan_progress,
 					 path, 1, 0);
 
-	pr_debug("current progress key (%llu %u %llu), search_slot ret %d\n",
-		 fs_info->qgroup_rescan_progress.objectid,
-		 fs_info->qgroup_rescan_progress.type,
-		 fs_info->qgroup_rescan_progress.offset, ret);
+	btrfs_debug(fs_info,
+		    "current progress key (%llu %u %llu), search_slot ret %d",
+		    fs_info->qgroup_rescan_progress.objectid,
+		    fs_info->qgroup_rescan_progress.type,
+		    fs_info->qgroup_rescan_progress.offset, ret);
 
 	if (ret) {
 		/*

@@ -9336,7 +9336,8 @@ int btrfs_drop_snapshot(struct btrfs_root *root,
 
 			btrfs_end_transaction_throttle(trans);
 			if (!for_reloc && btrfs_need_cleaner_sleep(fs_info)) {
-				pr_debug("BTRFS: drop snapshot early exit\n");
+				btrfs_debug(fs_info,
+					    "drop snapshot early exit");
 				err = -EAGAIN;
 				goto out_free;
 			}

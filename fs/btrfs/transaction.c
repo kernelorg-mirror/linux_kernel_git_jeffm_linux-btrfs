@@ -1312,7 +1312,7 @@ int btrfs_defrag_root(struct btrfs_root *root)
 			break;
 
 		if (btrfs_defrag_cancelled(info)) {
-			pr_debug("BTRFS: defrag_root cancelled\n");
+			btrfs_debug(info, "defrag_root cancelled");
 			ret = -EAGAIN;
 			break;
 		}
@@ -2333,7 +2333,7 @@ int btrfs_clean_one_deleted_snapshot(struct btrfs_root *root)
 	list_del_init(&root->root_list);
 	spin_unlock(&fs_info->trans_lock);
 
-	pr_debug("BTRFS: cleaner removing %llu\n", root->objectid);
+	btrfs_debug(fs_info, "cleaner removing %llu", root->objectid);
 
 	btrfs_kill_all_delayed_nodes(root);
 
