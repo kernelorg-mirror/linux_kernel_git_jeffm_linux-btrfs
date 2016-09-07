@@ -4739,21 +4739,9 @@ err:
 }
 
 struct extent_buffer *alloc_dummy_extent_buffer(struct btrfs_fs_info *fs_info,
-						u64 start, u32 nodesize)
+						u64 start)
 {
-	unsigned long len;
-
-	if (!fs_info) {
-		/*
-		 * Called only from tests that don't always have a fs_info
-		 * available
-		 */
-		len = nodesize;
-	} else {
-		len = fs_info->nodesize;
-	}
-
-	return __alloc_dummy_extent_buffer(fs_info, start, len);
+	return __alloc_dummy_extent_buffer(fs_info, start, fs_info->nodesize);
 }
 
 static void check_buffer_tree_ref(struct extent_buffer *eb)
@@ -4844,7 +4832,7 @@ struct extent_buffer *find_extent_buffer(struct btrfs_fs_info *fs_info,
 
 #ifdef CONFIG_BTRFS_FS_RUN_SANITY_TESTS
 struct extent_buffer *alloc_test_extent_buffer(struct btrfs_fs_info *fs_info,
-					u64 start, u32 nodesize)
+					u64 start)
 {
 	struct extent_buffer *eb, *exists = NULL;
 	int ret;
@@ -4852,7 +4840,7 @@ struct extent_buffer *alloc_test_extent_buffer(struct btrfs_fs_info *fs_info,
 	eb = find_extent_buffer(fs_info, start);
 	if (eb)
 		return eb;
-	eb = alloc_dummy_extent_buffer(fs_info, start, nodesize);
+	eb = alloc_dummy_extent_buffer(fs_info, start);
 	if (!eb)
 		return NULL;
 	eb->fs_info = fs_info;

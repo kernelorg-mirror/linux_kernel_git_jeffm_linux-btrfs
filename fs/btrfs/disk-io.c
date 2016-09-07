@@ -1180,8 +1180,7 @@ struct extent_buffer *btrfs_find_create_tree_block(
 						u64 bytenr)
 {
 	if (btrfs_is_testing(fs_info))
-		return alloc_test_extent_buffer(fs_info, bytenr,
-						fs_info->nodesize);
+		return alloc_test_extent_buffer(fs_info, bytenr);
 	return alloc_extent_buffer(fs_info, bytenr);
 }
 
