@@ -42,10 +42,6 @@ static int link_free_space(struct btrfs_free_space_ctl *ctl,
 			   struct btrfs_free_space *info);
 static void unlink_free_space(struct btrfs_free_space_ctl *ctl,
 			      struct btrfs_free_space *info);
-static int btrfs_wait_cache_io_root(struct btrfs_root *root,
-			     struct btrfs_trans_handle *trans,
-			     struct btrfs_io_ctl *io_ctl,
-			     struct btrfs_path *path);
 
 static struct inode *__lookup_free_space_inode(struct btrfs_root *root,
 					       struct btrfs_path *path,
@@ -1234,8 +1230,7 @@ static int __btrfs_write_out_cache(struct btrfs_root *root, struct inode *inode,
 				   struct btrfs_free_space_ctl *ctl,
 				   struct btrfs_block_group_cache *block_group,
 				   struct btrfs_io_ctl *io_ctl,
-				   struct btrfs_trans_handle *trans,
-				   struct btrfs_path *path, u64 offset)
+				   struct btrfs_trans_handle *trans, u64 offset)
 {
 	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct extent_state *cached_state = NULL;
@@ -1393,7 +1388,7 @@ int btrfs_write_out_cache(struct btrfs_fs_info *fs_info,
 
 	ret = __btrfs_write_out_cache(fs_info->tree_root, inode, ctl,
 				      block_group, &block_group->io_ctl, trans,
-				      path, block_group->key.objectid);
+				      block_group->key.objectid);
 	if (ret) {
 #ifdef DEBUG
 		btrfs_err(fs_info,
@@ -3541,7 +3536,7 @@ int btrfs_write_out_ino_cache(struct btrfs_root *root,
 
 	memset(&io_ctl, 0, sizeof(io_ctl));
 	ret = __btrfs_write_out_cache(root, inode, ctl, NULL, &io_ctl,
-				      trans, path, 0);
+				      trans, 0);
 	if (!ret) {
 		/*
 		 * At this point writepages() didn't error out, so our metadata
